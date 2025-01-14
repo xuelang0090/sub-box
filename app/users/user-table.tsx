@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useTransition } from "react"
-import { Edit2, Trash2 } from 'lucide-react'
+import { Edit2, Trash2, ChevronRight, ChevronDown } from 'lucide-react'
 
 import { Button } from "@/components/ui/button"
 import {
@@ -24,20 +24,24 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { PopupSheet } from "@/components/popup-sheet"
-import { type User } from "@/types"
+import { type User, type SubscriptionSourceItem, type SubscriptionSource } from "@/types"
 import { IdBadge } from "@/components/id-badge"
 import { DateTime } from "@/components/date-time"
 
 import { deleteUser } from "./actions"
 import { UserForm } from "./user-form"
+import { UserSubscriptionItemTable } from "./user-subscription-item-table"
 
 interface UserTableProps {
   users: User[]
+  items: SubscriptionSourceItem[]
+  sources: SubscriptionSource[]
 }
 
-export function UserTable({ users }: UserTableProps) {
+export function UserTable({ users, items, sources }: UserTableProps) {
   const [editingUser, setEditingUser] = useState<User | null>(null)
   const [deletingUser, setDeletingUser] = useState<User | null>(null)
+  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set())
   const [isPending, startTransition] = useTransition()
   const { toast } = useToast()
 
@@ -58,11 +62,32 @@ export function UserTable({ users }: UserTableProps) {
     })
   }
 
+  function toggleExpand(id: string) {
+    const newExpandedItems = new Set(expandedItems)
+    if (newExpandedItems.has(id)) {
+      newExpandedItems.delete(id)
+    } else {
+      newExpandedItems.add(id)
+    }
+    setExpandedItems(newExpandedItems)
+  }
+
+  // Group items by user id
+  const itemsByUser = items.reduce((acc, item) => {
+    const userId = item.userId
+    if (!acc[userId]) {
+      acc[userId] = []
+    }
+    acc[userId].push(item)
+    return acc
+  }, {} as Record<string, SubscriptionSourceItem[]>)
+
   return (
     <>
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead className="w-[50px]"></TableHead>
             <TableHead>ID</TableHead>
             <TableHead>名称</TableHead>
             <TableHead>订阅转换器</TableHead>
@@ -75,40 +100,73 @@ export function UserTable({ users }: UserTableProps) {
         <TableBody>
           {users.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={7} className="h-24 text-center">
+              <TableCell colSpan={8} className="h-24 text-center">
                 暂无数据
               </TableCell>
             </TableRow>
           ) : (
             users.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell><IdBadge id={user.id} /></TableCell>
-                <TableCell>{user.name}</TableCell>
-                <TableCell>{user.subconverterId ? <IdBadge id={user.subconverterId} /> : "-"}</TableCell>
-                <TableCell>{user.mergeConfigId ? <IdBadge id={user.mergeConfigId} /> : "-"}</TableCell>
-                <TableCell><DateTime date={user.createdAt} /></TableCell>
-                <TableCell><DateTime date={user.updatedAt} /></TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setEditingUser(user)}
-                    >
-                      <Edit2 className="h-4 w-4" />
-                      <span className="sr-only">编辑</span>
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setDeletingUser(user)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                      <span className="sr-only">删除</span>
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
+              <>
+                <TableRow key={user.id}>
+                  <TableCell>
+                    <div className="flex items-center">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6"
+                        onClick={() => toggleExpand(user.id)}
+                      >
+                        {expandedItems.has(user.id) ? (
+                          <ChevronDown className="h-4 w-4" />
+                        ) : (
+                          <ChevronRight className="h-4 w-4" />
+                        )}
+                        <span className="sr-only">展开</span>
+                      </Button>
+                      <span className="text-sm text-muted-foreground">
+                        ({itemsByUser[user.id]?.length || 0})
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell><IdBadge id={user.id} /></TableCell>
+                  <TableCell>{user.name}</TableCell>
+                  <TableCell>{user.subconverterId ? <IdBadge id={user.subconverterId} /> : "-"}</TableCell>
+                  <TableCell>{user.mergeConfigId ? <IdBadge id={user.mergeConfigId} /> : "-"}</TableCell>
+                  <TableCell><DateTime date={user.createdAt} /></TableCell>
+                  <TableCell><DateTime date={user.updatedAt} /></TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setEditingUser(user)}
+                      >
+                        <Edit2 className="h-4 w-4" />
+                        <span className="sr-only">编辑</span>
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setDeletingUser(user)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        <span className="sr-only">删除</span>
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+                {expandedItems.has(user.id) && (
+                  <TableRow>
+                    <TableCell colSpan={8} className="p-0 pl-20">
+                      <UserSubscriptionItemTable
+                        userId={user.id}
+                        items={itemsByUser[user.id] || []}
+                        sources={sources}
+                      />
+                    </TableCell>
+                  </TableRow>
+                )}
+              </>
             ))
           )}
         </TableBody>

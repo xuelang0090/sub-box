@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useTransition } from "react"
-import * as React from "react"
 import { Edit2, Trash2, PlusCircle } from 'lucide-react'
 import { toast } from "sonner"
 
@@ -25,24 +24,23 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { PopupSheet } from "@/components/popup-sheet"
-import { type SubscriptionSourceItem, type User, type SubscriptionSource } from "@/types"
+import { type SubscriptionSourceItem, type SubscriptionSource } from "@/types"
 import { IdBadge } from "@/components/id-badge"
 import { DateTime } from "@/components/date-time"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { UrlDisplay } from "@/components/url-display"
 
-import { deleteSubscriptionSourceItem } from "./actions"
-import { SubscriptionSourceItemForm } from "./subscription-source-item-form"
+import { deleteSubscriptionSourceItem } from "../subscriptions/actions"
+import { SubscriptionSourceItemForm } from "../subscriptions/subscription-source-item-form"
 
-interface SubscriptionSourceItemTableProps {
+interface UserSubscriptionItemTableProps {
+  userId: string
   items: SubscriptionSourceItem[]
-  sourceId: string
-  source: SubscriptionSource
-  users: User[]
+  sources: SubscriptionSource[]
 }
 
-export function SubscriptionSourceItemTable({ items, sourceId, source, users }: SubscriptionSourceItemTableProps) {
+export function UserSubscriptionItemTable({ userId, items, sources }: UserSubscriptionItemTableProps) {
   const [editingItem, setEditingItem] = useState<SubscriptionSourceItem | null>(null)
   const [deletingItem, setDeletingItem] = useState<SubscriptionSourceItem | null>(null)
   const [isCreating, setIsCreating] = useState(false)
@@ -77,7 +75,7 @@ export function SubscriptionSourceItemTable({ items, sourceId, source, users }: 
             <TableHeader>
               <TableRow>
                 <TableHead>ID</TableHead>
-                <TableHead>用户</TableHead>
+                <TableHead>订阅源</TableHead>
                 <TableHead>URL</TableHead>
                 <TableHead>状态</TableHead>
                 <TableHead>最新</TableHead>
@@ -88,47 +86,50 @@ export function SubscriptionSourceItemTable({ items, sourceId, source, users }: 
             <TableBody>
               {items.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-24 text-center">
+                  <TableCell colSpan={7} className="h-24 text-center">
                     暂无数据
                   </TableCell>
                 </TableRow>
               ) : (
-                items.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell><IdBadge id={item.id} /></TableCell>
-                    <TableCell>{users.find(u => u.id === item.userId)?.name || '-'}</TableCell>
-                    <TableCell>
-                      <UrlDisplay url={item.url} />
-                    </TableCell>
-                    <TableCell>{item.enable ? '启用' : '禁用'}</TableCell>
-                    <TableCell>
-                      <Badge variant={item.upToDate ? "success" : "destructive"}>
-                        {item.upToDate ? '是' : '否'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell><DateTime date={item.updatedAt} /></TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => setEditingItem(item)}
-                        >
-                          <Edit2 className="h-4 w-4" />
-                          <span className="sr-only">编辑</span>
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => setDeletingItem(item)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                          <span className="sr-only">删除</span>
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
+                items.map((item) => {
+                  const source = sources.find(s => s.id === item.subscriptionSourceId)
+                  return (
+                    <TableRow key={item.id}>
+                      <TableCell><IdBadge id={item.id} /></TableCell>
+                      <TableCell>{source?.name || '-'}</TableCell>
+                      <TableCell>
+                        <UrlDisplay url={item.url} />
+                      </TableCell>
+                      <TableCell>{item.enable ? '启用' : '禁用'}</TableCell>
+                      <TableCell>
+                        <Badge variant={item.upToDate ? "success" : "destructive"}>
+                          {item.upToDate ? '是' : '否'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell><DateTime date={item.updatedAt} /></TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setEditingItem(item)}
+                          >
+                            <Edit2 className="h-4 w-4" />
+                            <span className="sr-only">编辑</span>
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setDeletingItem(item)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            <span className="sr-only">删除</span>
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })
               )}
             </TableBody>
           </Table>
@@ -146,8 +147,8 @@ export function SubscriptionSourceItemTable({ items, sourceId, source, users }: 
         title={editingItem ? "编辑订阅源项目" : "添加订阅源项目"}
       >
         <SubscriptionSourceItemForm
-          sources={[source]}
-          users={users}
+          userId={userId}
+          sources={sources}
           item={editingItem ?? undefined}
           onSuccess={() => {
             setEditingItem(null)

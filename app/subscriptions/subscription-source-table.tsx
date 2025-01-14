@@ -1,7 +1,9 @@
 "use client"
 
 import { useState, useTransition } from "react"
+import * as React from "react"
 import { Edit2, Trash2, ChevronRight, ChevronDown } from 'lucide-react'
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -12,7 +14,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { useToast } from "@/components/ui/use-toast"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -45,19 +46,15 @@ export function SubscriptionSourceTable({ sources, users }: SubscriptionSourceTa
     new Set(sources.map(source => source.id))
   )
   const [isPending, startTransition] = useTransition()
-  const { toast } = useToast()
 
   function onDelete(item: SubscriptionSource) {
     startTransition(async () => {
       try {
         await deleteSubscriptionSource(item.id)
-        toast({
-          description: "删除成功",
-        })
+        toast("删除成功")
         setDeletingItem(null)
       } catch (error) {
-        toast({
-          variant: "destructive",
+        toast("删除失败", {
           description: (error as Error).message,
         })
       }
@@ -99,8 +96,8 @@ export function SubscriptionSourceTable({ sources, users }: SubscriptionSourceTa
             </TableRow>
           ) : (
             sources.map((item) => (
-              <>
-                <TableRow key={item.id}>
+              <React.Fragment key={item.id}>
+                <TableRow>
                   <TableCell>
                     <div className="flex items-center">
                       <Button
@@ -154,13 +151,14 @@ export function SubscriptionSourceTable({ sources, users }: SubscriptionSourceTa
                     <TableCell colSpan={9} className="p-0 pl-20">
                       <SubscriptionSourceItemTable
                         sourceId={item.id}
+                        source={item}
                         items={item.items}
                         users={users}
                       />
                     </TableCell>
                   </TableRow>
                 )}
-              </>
+              </React.Fragment>
             ))
           )}
         </TableBody>

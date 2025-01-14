@@ -21,7 +21,7 @@ export function IdBadge({ id, truncateLength = 6 }: IdBadgeProps) {
           <Badge variant="secondary" className="font-mono">
             {truncatedId}
           </Badge>
-        </TooltipTrigger>
+        </TooltipTrigger> 
         <TooltipContent>
           <p className="font-mono">{id}</p>
         </TooltipContent>

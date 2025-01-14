@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import { AppSidebar } from "@/components/app-sidebar"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { cn } from "@/lib/utils"
+import { Toaster } from "@/components/ui/sonner"
 
 import "./globals.css"
 
@@ -22,6 +23,7 @@ export default function RootLayout({
             <main className="container mx-auto py-6 px-4 md:px-6">{children}</main>
           </SidebarInset>
         </SidebarProvider>
+        <Toaster />
       </body>
     </html>
   )

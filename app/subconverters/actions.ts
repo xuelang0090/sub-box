@@ -8,13 +8,13 @@ export async function getSubconverters() {
   return subconverterService.getAll()
 }
 
-export async function createSubconverter(data: Omit<Subconverter, "id">) {
+export async function createSubconverter(data: Omit<Subconverter, "id" | "createdAt" | "updatedAt">) {
   const subconverter = await subconverterService.create(data)
   revalidatePath("/subconverters")
   return subconverter
 }
 
-export async function updateSubconverter(id: string, data: Omit<Subconverter, "id">) {
+export async function updateSubconverter(id: string, data: Partial<Omit<Subconverter, "id" | "createdAt" | "updatedAt">>) {
   const subconverter = await subconverterService.update(id, data)
   revalidatePath("/subconverters")
   return subconverter
