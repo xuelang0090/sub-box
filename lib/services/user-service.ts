@@ -1,33 +1,24 @@
 import "server-only"
-import { User } from '@/types'
-import { JsonStorage } from '../storage/json-storage'
+import { type User } from "@/types"
+import { JsonStorage } from "../storage/json-storage"
 
-export class UserService {
-  private storage: JsonStorage<User>
+const storage = new JsonStorage<User>("users.json")
 
-  constructor() {
-    this.storage = new JsonStorage<User>('users.json')
-  }
-
+class UserService {
   async getAll(): Promise<User[]> {
-    return this.storage.getAll()
+    return storage.getAll()
   }
 
-  async get(id: string): Promise<User | null> {
-    return this.storage.get(id)
+  async create(data: Omit<User, "id" | "createdAt" | "updatedAt">): Promise<User> {
+    return storage.create(data)
   }
 
-  async create(user: Omit<User, 'id'>): Promise<User> {
-    const id = crypto.randomUUID()
-    return this.storage.create({ ...user, id })
-  }
-
-  async update(id: string, user: Omit<User, 'id'>): Promise<User> {
-    return this.storage.update(id, { ...user, id })
+  async update(id: string, data: Partial<Omit<User, "id" | "createdAt" | "updatedAt">>): Promise<User> {
+    return storage.update(id, data)
   }
 
   async delete(id: string): Promise<void> {
-    return this.storage.delete(id)
+    return storage.delete(id)
   }
 }
 

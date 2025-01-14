@@ -1,83 +1,97 @@
 import "server-only"
-import { promises as fs } from 'fs'
-import path from 'path'
+import { promises as fs } from "fs"
+import { join } from "path"
+import crypto from "crypto"
 
-import { Storage } from './interface'
+const DATA_DIR = join(process.cwd(), "data")
 
 interface WithId {
   id: string
+  createdAt: string
+  updatedAt: string
 }
 
-export class JsonStorage<T extends WithId> implements Storage<T> {
+export class JsonStorage<T extends WithId> {
   private filePath: string
-  private data: Map<string, T> | null = null
 
-  constructor(fileName: string) {
-    const dataDir = process.env.DATA_DIR || './data'
-    this.filePath = path.join(dataDir, fileName)
+  constructor(filename: string) {
+    this.filePath = join(DATA_DIR, filename)
   }
 
-  private async ensureDataLoaded() {
-    if (this.data !== null) return
-
+  private async ensureDataDir() {
     try {
-      await fs.mkdir(path.dirname(this.filePath), { recursive: true })
-      const content = await fs.readFile(this.filePath, 'utf-8')
-      const items = JSON.parse(content)
-      this.data = new Map(items.map((item: T) => [item.id, item]))
-    } catch (error) {
-      if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
-        this.data = new Map()
-        await this.save()
-      } else {
-        throw error
-      }
+      await fs.access(DATA_DIR)
+    } catch {
+      await fs.mkdir(DATA_DIR, { recursive: true })
     }
   }
 
-  private async save() {
-    if (!this.data) return
-    const items = Array.from(this.data.values())
-    await fs.writeFile(this.filePath, JSON.stringify(items, null, 2))
+  private async readFile(): Promise<T[]> {
+    try {
+      await this.ensureDataDir()
+      const data = await fs.readFile(this.filePath, "utf-8")
+      return JSON.parse(data)
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+        return []
+      }
+      throw error
+    }
+  }
+
+  private async writeFile(data: T[]) {
+    await this.ensureDataDir()
+    await fs.writeFile(this.filePath, JSON.stringify(data, null, 2))
   }
 
   async getAll(): Promise<T[]> {
-    await this.ensureDataLoaded()
-    return Array.from(this.data!.values())
+    return this.readFile()
   }
 
   async get(id: string): Promise<T | null> {
-    await this.ensureDataLoaded()
-    return this.data!.get(id) || null
+    const items = await this.readFile()
+    return items.find(item => item.id === id) ?? null
   }
 
-  async create(item: T): Promise<T> {
-    await this.ensureDataLoaded()
-    if (this.data!.has(item.id)) {
-      throw new Error(`Item with id ${item.id} already exists`)
-    }
-    this.data!.set(item.id, item)
-    await this.save()
+  async create(data: Omit<T, keyof WithId>): Promise<T> {
+    const items = await this.readFile()
+    const now = new Date().toISOString()
+    const item = {
+      ...data,
+      id: crypto.randomUUID(),
+      createdAt: now,
+      updatedAt: now,
+    } as T
+    items.push(item)
+    await this.writeFile(items)
     return item
   }
 
-  async update(id: string, item: T): Promise<T> {
-    await this.ensureDataLoaded()
-    if (!this.data!.has(id)) {
+  async update(id: string, data: Partial<Omit<T, keyof WithId>>): Promise<T> {
+    const items = await this.readFile()
+    const index = items.findIndex(item => item.id === id)
+    if (index === -1) {
       throw new Error(`Item with id ${id} not found`)
     }
-    this.data!.set(id, { ...item, id })
-    await this.save()
-    return item
+    const item = items[index]
+    const updatedItem = {
+      ...item,
+      ...data,
+      updatedAt: new Date().toISOString(),
+    }
+    items[index] = updatedItem
+    await this.writeFile(items)
+    return updatedItem
   }
 
   async delete(id: string): Promise<void> {
-    await this.ensureDataLoaded()
-    if (!this.data!.has(id)) {
+    const items = await this.readFile()
+    const index = items.findIndex(item => item.id === id)
+    if (index === -1) {
       throw new Error(`Item with id ${id} not found`)
     }
-    this.data!.delete(id)
-    await this.save()
+    items.splice(index, 1)
+    await this.writeFile(items)
   }
 }
 

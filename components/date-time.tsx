@@ -1,9 +1,13 @@
 interface DateTimeProps {
-  date: string | Date
+  date?: string | Date
   format?: "datetime" | "date" | "time"
 }
 
 export function DateTime({ date, format = "datetime" }: DateTimeProps) {
+  if (!date) {
+    return <span>-</span>
+  }
+
   const d = typeof date === "string" ? new Date(date) : date
   
   let options: Intl.DateTimeFormatOptions = {}
@@ -37,9 +41,13 @@ export function DateTime({ date, format = "datetime" }: DateTimeProps) {
       break
   }
 
-  return (
-    <time dateTime={d.toISOString()}>
-      {d.toLocaleString('zh-CN', options)}
-    </time>
-  )
+  try {
+    return (
+      <time dateTime={d.toISOString()}>
+        {d.toLocaleString('zh-CN', options)}
+      </time>
+    )
+  } catch (error) {
+    return <span>Invalid Date</span>
+  }
 } 

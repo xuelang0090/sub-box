@@ -71,34 +71,42 @@ export function ClashConfigTable({ configs }: ClashConfigTableProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {configs.map((item) => (
-            <TableRow key={item.id}>
-              <TableCell><IdBadge id={item.id} /></TableCell>
-              <TableCell>{item.name}</TableCell>
-              <TableCell><DateTime date={item.createdAt} /></TableCell>
-              <TableCell><DateTime date={item.updatedAt} /></TableCell>
-              <TableCell>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setEditingItem(item)}
-                  >
-                    <Edit2 className="h-4 w-4" />
-                    <span className="sr-only">编辑</span>
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setDeletingItem(item)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    <span className="sr-only">删除</span>
-                  </Button>
-                </div>
+          {configs.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={5} className="h-24 text-center">
+                暂无数据
               </TableCell>
             </TableRow>
-          ))}
+          ) : (
+            configs.map((item) => (
+              <TableRow key={item.id}>
+                <TableCell><IdBadge id={item.id} /></TableCell>
+                <TableCell>{item.name}</TableCell>
+                <TableCell><DateTime date={item.createdAt} /></TableCell>
+                <TableCell><DateTime date={item.updatedAt} /></TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setEditingItem(item)}
+                    >
+                      <Edit2 className="h-4 w-4" />
+                      <span className="sr-only">编辑</span>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setDeletingItem(item)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      <span className="sr-only">删除</span>
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))
+          )}
         </TableBody>
       </Table>
 

@@ -1,33 +1,24 @@
 import "server-only"
-import { SubscriptionSource } from '@/types'
-import { JsonStorage } from '../storage/json-storage'
+import { type SubscriptionSource } from "@/types"
+import { JsonStorage } from "../storage/json-storage"
 
-export class SubscriptionSourceService {
-  private storage: JsonStorage<SubscriptionSource>
+const storage = new JsonStorage<SubscriptionSource>("subscription-sources.json")
 
-  constructor() {
-    this.storage = new JsonStorage<SubscriptionSource>('subscription-sources.json')
-  }
-
+class SubscriptionSourceService {
   async getAll(): Promise<SubscriptionSource[]> {
-    return this.storage.getAll()
+    return storage.getAll()
   }
 
-  async get(id: string): Promise<SubscriptionSource | null> {
-    return this.storage.get(id)
+  async create(data: Omit<SubscriptionSource, "id" | "createdAt" | "updatedAt">): Promise<SubscriptionSource> {
+    return storage.create(data)
   }
 
-  async create(source: Omit<SubscriptionSource, 'id'>): Promise<SubscriptionSource> {
-    const id = crypto.randomUUID()
-    return this.storage.create({ ...source, id })
-  }
-
-  async update(id: string, source: Omit<SubscriptionSource, 'id'>): Promise<SubscriptionSource> {
-    return this.storage.update(id, { ...source, id })
+  async update(id: string, data: Partial<Omit<SubscriptionSource, "id" | "createdAt" | "updatedAt">>): Promise<SubscriptionSource> {
+    return storage.update(id, data)
   }
 
   async delete(id: string): Promise<void> {
-    return this.storage.delete(id)
+    return storage.delete(id)
   }
 }
 

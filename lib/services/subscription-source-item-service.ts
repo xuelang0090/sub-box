@@ -1,34 +1,24 @@
 import "server-only"
-import { SubscriptionSourceItem } from '@/types'
-import { JsonStorage } from '../storage/json-storage'
-import crypto from 'crypto'
+import { type SubscriptionSourceItem } from "@/types"
+import { JsonStorage } from "../storage/json-storage"
 
-export class SubscriptionSourceItemService {
-  private storage: JsonStorage<SubscriptionSourceItem>
+const storage = new JsonStorage<SubscriptionSourceItem>("subscription-source-items.json")
 
-  constructor() {
-    this.storage = new JsonStorage<SubscriptionSourceItem>('subscription-source-items.json')
-  }
-
+class SubscriptionSourceItemService {
   async getAll(): Promise<SubscriptionSourceItem[]> {
-    return this.storage.getAll()
+    return storage.getAll()
   }
 
-  async get(id: string): Promise<SubscriptionSourceItem | null> {
-    return this.storage.get(id)
+  async create(data: Omit<SubscriptionSourceItem, "id" | "createdAt" | "updatedAt">): Promise<SubscriptionSourceItem> {
+    return storage.create(data)
   }
 
-  async create(item: Omit<SubscriptionSourceItem, 'id'>): Promise<SubscriptionSourceItem> {
-    const id = crypto.randomUUID()
-    return this.storage.create({ ...item, id })
-  }
-
-  async update(id: string, item: Omit<SubscriptionSourceItem, 'id'>): Promise<SubscriptionSourceItem> {
-    return this.storage.update(id, { ...item, id })
+  async update(id: string, data: Partial<Omit<SubscriptionSourceItem, "id" | "createdAt" | "updatedAt">>): Promise<SubscriptionSourceItem> {
+    return storage.update(id, data)
   }
 
   async delete(id: string): Promise<void> {
-    return this.storage.delete(id)
+    return storage.delete(id)
   }
 }
 

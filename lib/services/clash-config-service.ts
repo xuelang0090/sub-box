@@ -17,13 +17,12 @@ export class ClashConfigService {
     return this.storage.get(id)
   }
 
-  async create(config: Omit<ClashConfig, 'id'>): Promise<ClashConfig> {
-    const id = crypto.randomUUID()
-    return this.storage.create({ ...config, id })
+  async create(config: Omit<ClashConfig, 'id' | 'createdAt' | 'updatedAt'>): Promise<ClashConfig> {
+    return this.storage.create(config)
   }
 
-  async update(id: string, config: Omit<ClashConfig, 'id'>): Promise<ClashConfig> {
-    return this.storage.update(id, { ...config, id })
+  async update(id: string, config: Partial<Omit<ClashConfig, 'id' | 'createdAt' | 'updatedAt'>>): Promise<ClashConfig> {
+    return this.storage.update(id, config)
   }
 
   async delete(id: string): Promise<void> {

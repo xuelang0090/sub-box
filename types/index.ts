@@ -34,13 +34,13 @@ export interface SubscriptionSource {
   inboundProtocol: string
   ip?: string
   url?: string
-  lastUpdate: string
   createdAt: string
   updatedAt: string
 }
 
 // Subscription Source Item Model
 export interface SubscriptionSourceItem {
+  id: string
   subscriptionSourceId: string
   userId: string
   enable: boolean

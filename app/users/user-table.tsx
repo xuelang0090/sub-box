@@ -73,36 +73,44 @@ export function UserTable({ users }: UserTableProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {users.map((user) => (
-            <TableRow key={user.id}>
-              <TableCell><IdBadge id={user.id} /></TableCell>
-              <TableCell>{user.name}</TableCell>
-              <TableCell>{user.subconverterId ? <IdBadge id={user.subconverterId} /> : "-"}</TableCell>
-              <TableCell>{user.mergeConfigId ? <IdBadge id={user.mergeConfigId} /> : "-"}</TableCell>
-              <TableCell><DateTime date={user.createdAt} /></TableCell>
-              <TableCell><DateTime date={user.updatedAt} /></TableCell>
-              <TableCell>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setEditingUser(user)}
-                  >
-                    <Edit2 className="h-4 w-4" />
-                    <span className="sr-only">编辑</span>
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setDeletingUser(user)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    <span className="sr-only">删除</span>
-                  </Button>
-                </div>
+          {users.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={7} className="h-24 text-center">
+                暂无数据
               </TableCell>
             </TableRow>
-          ))}
+          ) : (
+            users.map((user) => (
+              <TableRow key={user.id}>
+                <TableCell><IdBadge id={user.id} /></TableCell>
+                <TableCell>{user.name}</TableCell>
+                <TableCell>{user.subconverterId ? <IdBadge id={user.subconverterId} /> : "-"}</TableCell>
+                <TableCell>{user.mergeConfigId ? <IdBadge id={user.mergeConfigId} /> : "-"}</TableCell>
+                <TableCell><DateTime date={user.createdAt} /></TableCell>
+                <TableCell><DateTime date={user.updatedAt} /></TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setEditingUser(user)}
+                    >
+                      <Edit2 className="h-4 w-4" />
+                      <span className="sr-only">编辑</span>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setDeletingUser(user)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      <span className="sr-only">删除</span>
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))
+          )}
         </TableBody>
       </Table>
 

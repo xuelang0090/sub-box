@@ -1,10 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { getSubscriptionSources } from "./actions"
+import { getUsers } from "../users/actions"
 import { SubscriptionSourceTable } from "./subscription-source-table"
 import { CreateSubscriptionDialog } from "./create-subscription-dialog"
 
 export default async function SubscriptionsPage() {
-  const sources = await getSubscriptionSources()
+  const [sources, users] = await Promise.all([
+    getSubscriptionSources(),
+    getUsers(),
+  ])
 
   return (
     <Card>
@@ -13,7 +17,7 @@ export default async function SubscriptionsPage() {
         <CreateSubscriptionDialog />
       </CardHeader>
       <CardContent>
-        <SubscriptionSourceTable sources={sources} />
+        <SubscriptionSourceTable sources={sources} users={users} />
       </CardContent>
     </Card>
   )

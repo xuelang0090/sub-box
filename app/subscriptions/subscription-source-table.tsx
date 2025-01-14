@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useTransition } from "react"
-import { Edit2, Trash2 } from 'lucide-react'
+import { Edit2, Trash2, ChevronRight, ChevronDown } from 'lucide-react'
 
 import { Button } from "@/components/ui/button"
 import {
@@ -24,20 +24,26 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { PopupSheet } from "@/components/popup-sheet"
-import { type SubscriptionSource } from "@/types"
+import { type SubscriptionSource, type User } from "@/types"
 import { IdBadge } from "@/components/id-badge"
 import { DateTime } from "@/components/date-time"
+import { cn } from "@/lib/utils"
 
 import { deleteSubscriptionSource } from "./actions"
 import { SubscriptionSourceForm } from "./subscription-source-form"
+import { SubscriptionSourceItemTable } from "./subscription-source-item-table"
 
 interface SubscriptionSourceTableProps {
-  sources: SubscriptionSource[]
+  sources: (SubscriptionSource & { items: any[] })[]
+  users: User[]
 }
 
-export function SubscriptionSourceTable({ sources }: SubscriptionSourceTableProps) {
+export function SubscriptionSourceTable({ sources, users }: SubscriptionSourceTableProps) {
   const [editingItem, setEditingItem] = useState<SubscriptionSource | null>(null)
   const [deletingItem, setDeletingItem] = useState<SubscriptionSource | null>(null)
+  const [expandedItems, setExpandedItems] = useState<Set<string>>(
+    new Set(sources.map(source => source.id))
+  )
   const [isPending, startTransition] = useTransition()
   const { toast } = useToast()
 
@@ -58,55 +64,105 @@ export function SubscriptionSourceTable({ sources }: SubscriptionSourceTableProp
     })
   }
 
+  function toggleExpand(id: string) {
+    const newExpandedItems = new Set(expandedItems)
+    if (newExpandedItems.has(id)) {
+      newExpandedItems.delete(id)
+    } else {
+      newExpandedItems.add(id)
+    }
+    setExpandedItems(newExpandedItems)
+  }
+
   return (
     <>
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead className="w-[50px]"></TableHead>
             <TableHead>ID</TableHead>
             <TableHead>名称</TableHead>
             <TableHead>入站协议</TableHead>
             <TableHead>IP</TableHead>
             <TableHead>URL</TableHead>
-            <TableHead>最后更新</TableHead>
             <TableHead>创建时间</TableHead>
             <TableHead>更新时间</TableHead>
             <TableHead className="w-[100px]">操作</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {sources.map((item) => (
-            <TableRow key={item.id}>
-              <TableCell><IdBadge id={item.id} /></TableCell>
-              <TableCell>{item.name}</TableCell>
-              <TableCell>{item.inboundProtocol}</TableCell>
-              <TableCell>{item.ip || "-"}</TableCell>
-              <TableCell>{item.url || "-"}</TableCell>
-              <TableCell>{item.lastUpdate ? <DateTime date={item.lastUpdate} /> : "-"}</TableCell>
-              <TableCell><DateTime date={item.createdAt} /></TableCell>
-              <TableCell><DateTime date={item.updatedAt} /></TableCell>
-              <TableCell>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setEditingItem(item)}
-                  >
-                    <Edit2 className="h-4 w-4" />
-                    <span className="sr-only">编辑</span>
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setDeletingItem(item)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    <span className="sr-only">删除</span>
-                  </Button>
-                </div>
+          {sources.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={9} className="h-24 text-center">
+                暂无数据
               </TableCell>
             </TableRow>
-          ))}
+          ) : (
+            sources.map((item) => (
+              <>
+                <TableRow key={item.id}>
+                  <TableCell>
+                    <div className="flex items-center">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6"
+                        onClick={() => toggleExpand(item.id)}
+                      >
+                        {expandedItems.has(item.id) ? (
+                          <ChevronDown className="h-4 w-4" />
+                        ) : (
+                          <ChevronRight className="h-4 w-4" />
+                        )}
+                        <span className="sr-only">展开</span>
+                      </Button>
+                      <span className="text-sm text-muted-foreground">
+                        ({item.items.length})
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell><IdBadge id={item.id} /></TableCell>
+                  <TableCell>{item.name}</TableCell>
+                  <TableCell>{item.inboundProtocol}</TableCell>
+                  <TableCell>{item.ip || "-"}</TableCell>
+                  <TableCell>{item.url || "-"}</TableCell>
+                  <TableCell><DateTime date={item.createdAt} /></TableCell>
+                  <TableCell><DateTime date={item.updatedAt} /></TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setEditingItem(item)}
+                      >
+                        <Edit2 className="h-4 w-4" />
+                        <span className="sr-only">编辑</span>
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setDeletingItem(item)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        <span className="sr-only">删除</span>
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+                {expandedItems.has(item.id) && (
+                  <TableRow>
+                    <TableCell colSpan={9} className="p-0 pl-20">
+                      <SubscriptionSourceItemTable
+                        sourceId={item.id}
+                        items={item.items}
+                        users={users}
+                      />
+                    </TableCell>
+                  </TableRow>
+                )}
+              </>
+            ))
+          )}
         </TableBody>
       </Table>
 

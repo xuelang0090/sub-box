@@ -1,33 +1,24 @@
 import "server-only"
-import { Subconverter } from '@/types'
-import { JsonStorage } from '../storage/json-storage'
+import { type Subconverter } from "@/types"
+import { JsonStorage } from "../storage/json-storage"
 
-export class SubconverterService {
-  private storage: JsonStorage<Subconverter>
+const storage = new JsonStorage<Subconverter>("subconverters.json")
 
-  constructor() {
-    this.storage = new JsonStorage<Subconverter>('subconverters.json')
-  }
-
+class SubconverterService {
   async getAll(): Promise<Subconverter[]> {
-    return this.storage.getAll()
+    return storage.getAll()
   }
 
-  async get(id: string): Promise<Subconverter | null> {
-    return this.storage.get(id)
+  async create(data: Omit<Subconverter, "id" | "createdAt" | "updatedAt">): Promise<Subconverter> {
+    return storage.create(data)
   }
 
-  async create(subconverter: Omit<Subconverter, 'id'>): Promise<Subconverter> {
-    const id = crypto.randomUUID()
-    return this.storage.create({ ...subconverter, id })
-  }
-
-  async update(id: string, subconverter: Omit<Subconverter, 'id'>): Promise<Subconverter> {
-    return this.storage.update(id, { ...subconverter, id })
+  async update(id: string, data: Partial<Omit<Subconverter, "id" | "createdAt" | "updatedAt">>): Promise<Subconverter> {
+    return storage.update(id, data)
   }
 
   async delete(id: string): Promise<void> {
-    return this.storage.delete(id)
+    return storage.delete(id)
   }
 }
 
