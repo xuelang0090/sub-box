@@ -48,3 +48,4 @@ public/workbox-*.js.map
 public/worker-*.js.map
 
 data
+*.db

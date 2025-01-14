@@ -1,52 +1,21 @@
+import { InferSelectModel } from 'drizzle-orm';
+import { users, subconverters, clashConfigs, subscriptionSources, subscriptionSourceItems } from '@/server/db/schema';
+
 // User Model
-export interface User {
-  id: string
-  name: string
-  subconverterId?: string
-  mergeConfigId?: string
-  createdAt: string
-  updatedAt: string
-}
+export type User = InferSelectModel<typeof users>;
 
 // Subconverter Model
-export interface Subconverter {
-  id: string
-  url: string
-  options: Record<string, string>
-  createdAt: string
-  updatedAt: string
+export type SubconverterRow = InferSelectModel<typeof subconverters>;
+export interface Subconverter extends Omit<SubconverterRow, 'options'> {
+  options: Record<string, string>;
 }
 
 // Clash Config Model
-export interface ClashConfig {
-  id: string
-  name: string
-  globalConfig: string // YAML format
-  rules: string // YAML format
-  createdAt: string
-  updatedAt: string
-}
+export type ClashConfig = InferSelectModel<typeof clashConfigs>;
 
 // Subscription Source Model
-export interface SubscriptionSource {
-  id: string
-  name: string
-  inboundProtocol: string
-  ip?: string
-  url?: string
-  createdAt: string
-  updatedAt: string
-}
+export type SubscriptionSource = InferSelectModel<typeof subscriptionSources>;
 
 // Subscription Source Item Model
-export interface SubscriptionSourceItem {
-  id: string
-  subscriptionSourceId: string
-  userId: string
-  enable: boolean
-  url: string
-  upToDate: boolean
-  createdAt: string
-  updatedAt: string
-}
+export type SubscriptionSourceItem = InferSelectModel<typeof subscriptionSourceItems>;
 

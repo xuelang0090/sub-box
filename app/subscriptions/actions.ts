@@ -1,8 +1,8 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
-import { subscriptionSourceService } from "@/lib/services/subscription-source-service"
-import { subscriptionSourceItemService } from "@/lib/services/subscription-source-item-service"
+import { subscriptionSourceService } from "@/server/services/subscription-source-service"
+import { subscriptionSourceItemService } from "@/server/services/subscription-source-item-service"
 import type { SubscriptionSource, SubscriptionSourceItem } from "@/types"
 
 export async function getSubscriptionSources() {

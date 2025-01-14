@@ -1,7 +1,7 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
-import { clashConfigService } from "@/lib/services/clash-config-service"
+import { clashConfigService } from "@/server/services/clash-config-service"
 import type { ClashConfig } from "@/types"
 
 export async function getClashConfigs() {

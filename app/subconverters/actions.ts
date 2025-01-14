@@ -1,7 +1,7 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
-import { subconverterService } from "@/lib/services/subconverter-service"
+import { subconverterService } from "@/server/services/subconverter-service"
 import type { Subconverter } from "@/types"
 
 export async function getSubconverters() {

@@ -1,7 +1,7 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
-import { userService } from "@/lib/services/user-service"
+import { userService } from "@/server/services/user-service"
 import type { User } from "@/types"
 
 export async function getUsers() {
