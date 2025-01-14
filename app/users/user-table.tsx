@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react"
 import { Edit2, Trash2, ChevronRight, ChevronDown } from 'lucide-react'
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -12,7 +13,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { useToast } from "@/components/ui/use-toast"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -43,21 +43,15 @@ export function UserTable({ users, items, sources }: UserTableProps) {
   const [deletingUser, setDeletingUser] = useState<User | null>(null)
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set())
   const [isPending, startTransition] = useTransition()
-  const { toast } = useToast()
 
   function onDelete(user: User) {
     startTransition(async () => {
       try {
         await deleteUser(user.id)
-        toast({
-          description: "删除成功",
-        })
+        toast("删除成功")
         setDeletingUser(null)
       } catch (error) {
-        toast({
-          variant: "destructive",
-          description: (error as Error).message,
-        })
+        toast.error((error as Error).message)
       }
     })
   }

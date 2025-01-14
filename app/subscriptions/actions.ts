@@ -25,13 +25,13 @@ export async function getSubscriptionSources() {
   }))
 }
 
-export async function createSubscriptionSource(data: Omit<SubscriptionSource, "id">) {
+export async function createSubscriptionSource(data: Omit<SubscriptionSource, "id" | "createdAt" | "updatedAt">) {
   const source = await subscriptionSourceService.create(data)
   revalidatePath("/subscriptions")
   return source
 }
 
-export async function updateSubscriptionSource(id: string, data: Omit<SubscriptionSource, "id">) {
+export async function updateSubscriptionSource(id: string, data: Partial<Omit<SubscriptionSource, "id" | "createdAt" | "updatedAt">>) {
   const source = await subscriptionSourceService.update(id, data)
   revalidatePath("/subscriptions")
   return source

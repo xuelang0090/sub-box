@@ -4,6 +4,7 @@ import { useTransition } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -16,7 +17,6 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { useToast } from "@/components/ui/use-toast"
 import { type ClashConfig } from "@/types"
 
 import { createClashConfig, updateClashConfig } from "./actions"
@@ -35,7 +35,6 @@ interface ClashConfigFormProps {
 }
 
 export function ClashConfigForm({ config, onSuccess }: ClashConfigFormProps) {
-  const { toast } = useToast()
   const [isPending, startTransition] = useTransition()
 
   const form = useForm<FormData>({
@@ -56,16 +55,11 @@ export function ClashConfigForm({ config, onSuccess }: ClashConfigFormProps) {
           await createClashConfig(data)
         }
 
-        toast({
-          description: "保存成功",
-        })
+        toast("保存成功")
         
         onSuccess?.()
       } catch (error) {
-        toast({
-          variant: "destructive",
-          description: (error as Error).message,
-        })
+        toast.error((error as Error).message)
       }
     })
   }

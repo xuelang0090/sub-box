@@ -8,13 +8,13 @@ export async function getClashConfigs() {
   return clashConfigService.getAll()
 }
 
-export async function createClashConfig(data: Omit<ClashConfig, "id">) {
+export async function createClashConfig(data: Omit<ClashConfig, "id" | "createdAt" | "updatedAt">) {
   const config = await clashConfigService.create(data)
   revalidatePath("/clash-configs")
   return config
 }
 
-export async function updateClashConfig(id: string, data: Omit<ClashConfig, "id">) {
+export async function updateClashConfig(id: string, data: Omit<ClashConfig, "id" | "createdAt" | "updatedAt">) {
   const config = await clashConfigService.update(id, data)
   revalidatePath("/clash-configs")
   return config

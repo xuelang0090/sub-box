@@ -4,6 +4,7 @@ import { useTransition } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -22,7 +23,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { useToast } from "@/components/ui/use-toast"
 import { type User, type Subconverter, type ClashConfig } from "@/types"
 
 import { createUser, updateUser, getSubconverters, getClashConfigs } from "./actions"
@@ -42,7 +42,6 @@ interface UserFormProps {
 }
 
 export function UserForm({ user, onSuccess }: UserFormProps) {
-  const { toast } = useToast()
   const [isPending, startTransition] = useTransition()
   const [subconverters, setSubconverters] = useState<Subconverter[]>([])
   const [clashConfigs, setClashConfigs] = useState<ClashConfig[]>([])
@@ -81,16 +80,11 @@ export function UserForm({ user, onSuccess }: UserFormProps) {
           })
         }
 
-        toast({
-          description: "保存成功",
-        })
+        toast("保存成功")
         
         onSuccess?.()
       } catch (error) {
-        toast({
-          variant: "destructive",
-          description: (error as Error).message,
-        })
+        toast.error((error as Error).message)
       }
     })
   }

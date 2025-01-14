@@ -4,6 +4,7 @@ import { useTransition } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -22,7 +23,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { useToast } from "@/components/ui/use-toast"
 import { type SubscriptionSource } from "@/types"
 
 import { createSubscriptionSource, updateSubscriptionSource } from "./actions"
@@ -42,7 +42,6 @@ interface SubscriptionSourceFormProps {
 }
 
 export function SubscriptionSourceForm({ source, onSuccess }: SubscriptionSourceFormProps) {
-  const { toast } = useToast()
   const [isPending, startTransition] = useTransition()
 
   const form = useForm<FormData>({
@@ -60,7 +59,8 @@ export function SubscriptionSourceForm({ source, onSuccess }: SubscriptionSource
       try {
         const submitData = {
           ...data,
-          lastUpdate: new Date().toISOString(),
+          ip: data.ip || null,
+          url: data.url || null,
         }
         if (source) {
           await updateSubscriptionSource(source.id, submitData)
@@ -68,16 +68,11 @@ export function SubscriptionSourceForm({ source, onSuccess }: SubscriptionSource
           await createSubscriptionSource(submitData)
         }
 
-        toast({
-          description: "保存成功",
-        })
+        toast("保存成功")
         
         onSuccess?.()
       } catch (error) {
-        toast({
-          variant: "destructive",
-          description: (error as Error).message,
-        })
+        toast.error((error as Error).message)
       }
     })
   }
