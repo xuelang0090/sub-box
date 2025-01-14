@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "sonner"
 import { type Subconverter } from "@/types"
+import { Checkbox } from "@/components/ui/checkbox"
 
 import { createSubconverter, updateSubconverter, verifySubconverterUrl } from "./actions"
 
@@ -26,18 +27,17 @@ const formSchema = z.object({
   url: z.string()
     .url("请输入有效的URL")
     .refine(url => !url.endsWith('/'), "URL 末尾不能有斜杠"),
-  options: z.record(z.string()).superRefine((val, ctx) => {
-    // 检查是否为单层 JSON 对象
-    for (const value of Object.values(val)) {
-      if (typeof value !== 'string') {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "选项值必须为字符串",
-        })
-        return
+  options: z.string()
+    .default("insert=false&config=https%3A%2F%2Fraw.githubusercontent.com%2FACL4SSR%2FACL4SSR%2Fmaster%2FClash%2Fconfig%2FACL4SSR_Online_Full_NoAuto.ini&emoji=true&list=false&xudp=false&udp=false&tfo=false&expand=true&scv=false&fdn=false&new_name=true")
+    .refine(str => {
+      try {
+        new URLSearchParams(str);
+        return true;
+      } catch {
+        return false;
       }
-    }
-  }),
+    }, "请输入有效的 URL 参数格式"),
+  isDefault: z.boolean(),
 })
 
 type FormData = z.infer<typeof formSchema>
@@ -54,29 +54,18 @@ export function SubconverterForm({ subconverter, onSuccess }: SubconverterFormPr
     resolver: zodResolver(formSchema),
     defaultValues: {
       url: subconverter?.url ?? "",
-      options: subconverter?.options ?? {},
+      options: subconverter?.options ?? "insert=false&config=https%3A%2F%2Fraw.githubusercontent.com%2FACL4SSR%2FACL4SSR%2Fmaster%2FClash%2Fconfig%2FACL4SSR_Online_Full_NoAuto.ini&emoji=true&list=false&xudp=false&udp=false&tfo=false&expand=true&scv=false&fdn=false&new_name=true",
+      isDefault: subconverter?.isDefault ?? false,
     },
   })
 
   function onSubmit(data: FormData) {
-    let options: Record<string, string>
-    try {
-      const parsed = JSON.parse(data.options as unknown as string)
-      if (typeof parsed !== 'object' || Array.isArray(parsed) || parsed === null) {
-        throw new Error("选项必须是对象格式")
-      }
-      options = parsed
-    } catch (error) {
-      toast((error as Error).message)
-      return
-    }
-
     startTransition(async () => {
       try {
         if (subconverter) {
-          await updateSubconverter(subconverter.id, { ...data, options })
+          await updateSubconverter(subconverter.id, data)
         } else {
-          await createSubconverter({ ...data, options })
+          await createSubconverter(data)
         }
 
         toast("保存成功")
@@ -141,27 +130,37 @@ export function SubconverterForm({ subconverter, onSuccess }: SubconverterFormPr
               <FormControl>
                 <Textarea
                   {...field}
-                  placeholder='{
-  "key1": "value1",
-  "key2": "value2"
-}'
-                  value={typeof field.value === 'object' ? JSON.stringify(field.value, null, 2) : field.value}
-                  onChange={e => {
-                    try {
-                      const parsed = JSON.parse(e.target.value)
-                      field.onChange(parsed)
-                    } catch {
-                      field.onChange(e.target.value)
-                    }
-                  }}
+                  placeholder="insert=false&config=https%3A%2F%2Fexample.com%2Fconfig.ini&emoji=true"
                   className="font-mono"
                   rows={5}
                 />
               </FormControl>
               <FormDescription>
-                请输入 JSON 格式的选项，只支持一层键值对
+                请输入 URL 参数格式的选项，例如：key1=value1&key2=value2
               </FormDescription>
               <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="isDefault"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+              <FormControl>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
+              <div className="space-y-1 leading-none">
+                <FormLabel>
+                  设为默认
+                </FormLabel>
+                <FormDescription>
+                  设为默认后，新用户将自动使用此转换器
+                </FormDescription>
+              </div>
             </FormItem>
           )}
         />

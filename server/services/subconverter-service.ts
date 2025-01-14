@@ -5,28 +5,9 @@ import { subconverters } from "../db/schema"
 import db from "../db"
 import crypto from "crypto"
 
-function parseOptionsString(optionsString: string): Record<string, string> {
-  if (!optionsString) return {};
-  const params = new URLSearchParams(optionsString);
-  const options: Record<string, string> = {};
-  params.forEach((value, key) => {
-    options[key] = value;
-  });
-  return options;
-}
-
-function stringifyOptions(options: Record<string, string>): string {
-  const params = new URLSearchParams();
-  Object.entries(options).forEach(([key, value]) => {
-    params.append(key, value);
-  });
-  return params.toString();
-}
-
 function rowToSubconverter(row: SubconverterRow): Subconverter {
   return {
     ...row,
-    options: parseOptionsString(row.options),
   };
 }
 
@@ -50,7 +31,6 @@ class SubconverterService {
     const now = new Date().toISOString();
     const item = {
       ...data,
-      options: stringifyOptions(data.options),
       id: crypto.randomUUID(),
       createdAt: now,
       updatedAt: now,
@@ -64,7 +44,6 @@ class SubconverterService {
     const now = new Date().toISOString();
     const updateData = {
       ...data,
-      options: data.options ? stringifyOptions(data.options) : undefined,
       updatedAt: now,
     };
 

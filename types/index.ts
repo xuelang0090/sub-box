@@ -7,7 +7,7 @@ export type User = InferSelectModel<typeof users>;
 // Subconverter Model
 export type SubconverterRow = InferSelectModel<typeof subconverters>;
 export interface Subconverter extends Omit<SubconverterRow, 'options'> {
-  options: Record<string, string>;
+  options: string;
 }
 
 // Clash Config Model

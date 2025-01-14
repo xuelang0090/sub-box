@@ -84,6 +84,7 @@ export function UserTable({ users, items, sources }: UserTableProps) {
             <TableHead className="w-[50px]"></TableHead>
             <TableHead>ID</TableHead>
             <TableHead>名称</TableHead>
+            <TableHead>订阅密钥</TableHead>
             <TableHead>订阅转换器</TableHead>
             <TableHead>Clash 配置</TableHead>
             <TableHead>创建时间</TableHead>
@@ -124,6 +125,11 @@ export function UserTable({ users, items, sources }: UserTableProps) {
                   </TableCell>
                   <TableCell><IdBadge id={user.id} /></TableCell>
                   <TableCell>{user.name}</TableCell>
+                  <TableCell>
+                    <code className="rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
+                      {user.subscriptionKey}
+                    </code>
+                  </TableCell>
                   <TableCell>{user.subconverterId ? <IdBadge id={user.subconverterId} /> : "-"}</TableCell>
                   <TableCell>{user.mergeConfigId ? <IdBadge id={user.mergeConfigId} /> : "-"}</TableCell>
                   <TableCell><DateTime date={user.createdAt} /></TableCell>

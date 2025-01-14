@@ -5,6 +5,7 @@ import { relations } from 'drizzle-orm';
 export const users = sqliteTable('users', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
+  subscriptionKey: text('subscription_key').notNull().unique(),
   subconverterId: text('subconverter_id'),
   mergeConfigId: text('merge_config_id'),
   createdAt: text('created_at').notNull(),
@@ -28,6 +29,7 @@ export const subconverters = sqliteTable('subconverters', {
   id: text('id').primaryKey(),
   url: text('url').notNull(),
   options: text('options').notNull(), // URL query string format
+  isDefault: integer('is_default', { mode: 'boolean' }).notNull().default(false),
   createdAt: text('created_at').notNull(),
   updatedAt: text('updated_at').notNull(),
 });

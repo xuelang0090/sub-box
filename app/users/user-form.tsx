@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 import { toast } from "sonner"
+import crypto from "crypto"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -30,6 +31,7 @@ import { useEffect, useState } from "react"
 
 const formSchema = z.object({
   name: z.string().min(1, "名称不能为空"),
+  subscriptionKey: z.string().min(6, "订阅密钥至少需要6位").regex(/^[a-zA-Z0-9]+$/, "订阅密钥只能包含字母和数字"),
   subconverterId: z.string().nullable(),
   mergeConfigId: z.string().nullable(),
 })
@@ -45,6 +47,30 @@ export function UserForm({ user, onSuccess }: UserFormProps) {
   const [isPending, startTransition] = useTransition()
   const [subconverters, setSubconverters] = useState<Subconverter[]>([])
   const [clashConfigs, setClashConfigs] = useState<ClashConfig[]>([])
+
+  function generateSubscriptionKey() {
+    // 生成包含数字、小写字母和大写字母的8位密钥
+    const numbers = '0123456789';
+    const lowerCase = 'abcdefghijklmnopqrstuvwxyz';
+    const upperCase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const allChars = numbers + lowerCase + upperCase;
+    
+    // 确保至少包含每种字符
+    let key = '';
+    key += numbers[Math.floor(Math.random() * numbers.length)];
+    key += lowerCase[Math.floor(Math.random() * lowerCase.length)];
+    key += upperCase[Math.floor(Math.random() * upperCase.length)];
+    
+    // 随机填充剩余5位
+    for (let i = 0; i < 5; i++) {
+      key += allChars[Math.floor(Math.random() * allChars.length)];
+    }
+    
+    // 打乱顺序
+    key = key.split('').sort(() => Math.random() - 0.5).join('');
+    
+    form.setValue('subscriptionKey', key);
+  }
 
   useEffect(() => {
     const loadData = async () => {
@@ -62,6 +88,24 @@ export function UserForm({ user, onSuccess }: UserFormProps) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: user?.name ?? "",
+      subscriptionKey: user?.subscriptionKey ?? (() => {
+        // 初始化时也使用相同的生成规则
+        const numbers = '0123456789';
+        const lowerCase = 'abcdefghijklmnopqrstuvwxyz';
+        const upperCase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const allChars = numbers + lowerCase + upperCase;
+        
+        let key = '';
+        key += numbers[Math.floor(Math.random() * numbers.length)];
+        key += lowerCase[Math.floor(Math.random() * lowerCase.length)];
+        key += upperCase[Math.floor(Math.random() * upperCase.length)];
+        
+        for (let i = 0; i < 5; i++) {
+          key += allChars[Math.floor(Math.random() * allChars.length)];
+        }
+        
+        return key.split('').sort(() => Math.random() - 0.5).join('');
+      })(),
       subconverterId: user?.subconverterId ?? null,
       mergeConfigId: user?.mergeConfigId ?? null,
     },
@@ -72,6 +116,7 @@ export function UserForm({ user, onSuccess }: UserFormProps) {
       try {
         const submitData = {
           ...data,
+          subscriptionKey: data.subscriptionKey,
           subconverterId: data.subconverterId || null,
           mergeConfigId: data.mergeConfigId || null,
         }
@@ -102,6 +147,28 @@ export function UserForm({ user, onSuccess }: UserFormProps) {
               <FormControl>
                 <Input {...field} />
               </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="subscriptionKey"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>订阅密钥</FormLabel>
+              <div className="flex gap-2">
+                <FormControl>
+                  <Input {...field} placeholder="至少6位字母数字组合" />
+                </FormControl>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={generateSubscriptionKey}
+                >
+                  生成
+                </Button>
+              </div>
               <FormMessage />
             </FormItem>
           )}
