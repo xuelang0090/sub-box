@@ -61,6 +61,7 @@ export function SubconverterTable({ subconverters }: SubconverterTableProps) {
             <TableHead>ID</TableHead>
             <TableHead>URL</TableHead>
             <TableHead>选项</TableHead>
+            <TableHead>默认</TableHead>
             <TableHead>创建时间</TableHead>
             <TableHead>更新时间</TableHead>
             <TableHead className="w-[100px]">操作</TableHead>
@@ -79,6 +80,7 @@ export function SubconverterTable({ subconverters }: SubconverterTableProps) {
                 <TableCell><IdBadge id={item.id} /></TableCell>
                 <TableCell>{item.url}</TableCell>
                 <TableCell><CollapseDisplay url={item.options} maxLength={50} /></TableCell>
+                <TableCell>{item.isDefault ? "是" : "否"}</TableCell>
                 <TableCell><DateTime date={item.createdAt} /></TableCell>
                 <TableCell><DateTime date={item.updatedAt} /></TableCell>
                 <TableCell>

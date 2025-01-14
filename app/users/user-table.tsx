@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useTransition } from "react"
+import { useState, useTransition, useEffect } from "react"
 import { Edit2, Trash2, ChevronRight, ChevronDown } from 'lucide-react'
 import { toast } from "sonner"
 
@@ -27,6 +27,7 @@ import { PopupSheet } from "@/components/popup-sheet"
 import { type User, type SubscriptionSourceItem, type SubscriptionSource } from "@/types"
 import { IdBadge } from "@/components/id-badge"
 import { DateTime } from "@/components/date-time"
+import { CollapseDisplay } from "@/components/collapse-display"
 
 import { deleteUser } from "./actions"
 import { UserForm } from "./user-form"
@@ -42,7 +43,12 @@ export function UserTable({ users, items, sources }: UserTableProps) {
   const [editingUser, setEditingUser] = useState<User | null>(null)
   const [deletingUser, setDeletingUser] = useState<User | null>(null)
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set())
+  const [baseUrl, setBaseUrl] = useState("")
   const [isPending, startTransition] = useTransition()
+
+  useEffect(() => {
+    setBaseUrl(window.location.origin)
+  }, [])
 
   function onDelete(user: User) {
     startTransition(async () => {
@@ -66,6 +72,10 @@ export function UserTable({ users, items, sources }: UserTableProps) {
     setExpandedItems(newExpandedItems)
   }
 
+  function getSubscriptionUrl(subscriptionKey: string) {
+    return baseUrl ? `${baseUrl}/sub/${subscriptionKey}` : ""
+  }
+
   // Group items by user id
   const itemsByUser = items.reduce((acc, item) => {
     const userId = item.userId
@@ -84,7 +94,7 @@ export function UserTable({ users, items, sources }: UserTableProps) {
             <TableHead className="w-[50px]"></TableHead>
             <TableHead>ID</TableHead>
             <TableHead>名称</TableHead>
-            <TableHead>订阅密钥</TableHead>
+            <TableHead>订阅链接</TableHead>
             <TableHead>订阅转换器</TableHead>
             <TableHead>Clash 配置</TableHead>
             <TableHead>创建时间</TableHead>
@@ -126,9 +136,9 @@ export function UserTable({ users, items, sources }: UserTableProps) {
                   <TableCell><IdBadge id={user.id} /></TableCell>
                   <TableCell>{user.name}</TableCell>
                   <TableCell>
-                    <code className="rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
-                      {user.subscriptionKey}
-                    </code>
+                    {baseUrl && (
+                      <CollapseDisplay url={getSubscriptionUrl(user.subscriptionKey)} />
+                    )}
                   </TableCell>
                   <TableCell>{user.subconverterId ? <IdBadge id={user.subconverterId} /> : "-"}</TableCell>
                   <TableCell>{user.mergeConfigId ? <IdBadge id={user.mergeConfigId} /> : "-"}</TableCell>

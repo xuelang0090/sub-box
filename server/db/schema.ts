@@ -1,6 +1,11 @@
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
 import { relations } from 'drizzle-orm';
 
+// Notice for cursor AI:
+// after change the schema, you need to run the following commands:
+// run `bun db:generate` to generate migration file
+// run `bun db:migrate` to migrate the schema
+
 // User table
 export const users = sqliteTable('users', {
   id: text('id').primaryKey(),
@@ -37,9 +42,10 @@ export const subconverters = sqliteTable('subconverters', {
 // Clash Config table
 export const clashConfigs = sqliteTable('clash_configs', {
   id: text('id').primaryKey(),
+  key: text('key').notNull().unique(),
   name: text('name').notNull(),
-  globalConfig: text('global_config').notNull(), // YAML string
-  rules: text('rules').notNull(), // YAML string
+  globalConfig: text('global_config'), // YAML string
+  rules: text('rules'), // YAML string
   createdAt: text('created_at').notNull(),
   updatedAt: text('updated_at').notNull(),
 });

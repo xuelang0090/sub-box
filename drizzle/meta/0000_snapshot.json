@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "f57c7ff5-9782-48af-ba8c-a744712bb1df",
+  "id": "72e58c7b-4ad6-45e3-8ca6-1acc205f396c",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "clash_configs": {
@@ -11,6 +11,13 @@
           "name": "id",
           "type": "text",
           "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "key": {
+          "name": "key",
+          "type": "text",
+          "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
@@ -25,14 +32,14 @@
           "name": "global_config",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
         "rules": {
           "name": "rules",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
         "created_at": {
@@ -50,7 +57,15 @@
           "autoincrement": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "clash_configs_key_unique": {
+          "name": "clash_configs_key_unique",
+          "columns": [
+            "key"
+          ],
+          "isUnique": true
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
@@ -79,6 +94,14 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "is_default": {
+          "name": "is_default",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
         },
         "created_at": {
           "name": "created_at",
@@ -243,6 +266,13 @@
           "notNull": true,
           "autoincrement": false
         },
+        "subscription_key": {
+          "name": "subscription_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
         "subconverter_id": {
           "name": "subconverter_id",
           "type": "text",
@@ -272,7 +302,15 @@
           "autoincrement": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "users_subscription_key_unique": {
+          "name": "users_subscription_key_unique",
+          "columns": [
+            "subscription_key"
+          ],
+          "isUnique": true
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},

@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 import { toast } from "sonner"
+import { parse as parseYaml } from "yaml"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -22,9 +23,40 @@ import { type ClashConfig } from "@/types"
 import { createClashConfig, updateClashConfig } from "./actions"
 
 const formSchema = z.object({
+  key: z.string()
+    .min(2, "key 长度必须在 2-50 之间")
+    .max(50, "key 长度必须在 2-50 之间")
+    .regex(/^[a-zA-Z0-9]+$/, "key 只能包含英文和数字"),
   name: z.string().min(1, "名称不能为空"),
-  globalConfig: z.string().min(1, "全局配置不能为空"),
-  rules: z.string().min(1, "规则不能为空"),
+  globalConfig: z.string()
+    .transform(val => val.trim())
+    .refine(
+      (val) => {
+        if (!val) return true
+        try {
+          parseYaml(val)
+          return true
+        } catch {
+          return false
+        }
+      },
+      "全局配置必须是有效的 YAML 格式"
+    )
+    .transform(val => val || null),
+  rules: z.string()
+    .transform(val => val.trim())
+    .refine(
+      (val) => {
+        if (!val) return true
+        const lines = val.split("\n").filter(line => line.trim())
+        return lines.every(line => {
+          const parts = line.split(",")
+          return parts.length === 3 && parts.every(part => part.trim().length > 0)
+        })
+      },
+      "规则格式错误，每行必须是 TYPE,VALUE,PROXY 格式"
+    )
+    .transform(val => val || null),
 })
 
 type FormData = z.infer<typeof formSchema>
@@ -40,6 +72,7 @@ export function ClashConfigForm({ config, onSuccess }: ClashConfigFormProps) {
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      key: config?.key ?? "",
       name: config?.name ?? "",
       globalConfig: config?.globalConfig ?? "",
       rules: config?.rules ?? "",
@@ -69,6 +102,19 @@ export function ClashConfigForm({ config, onSuccess }: ClashConfigFormProps) {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
+          name="key"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Key</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="仅支持英文和数字" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
           name="name"
           render={({ field }) => (
             <FormItem>
@@ -83,12 +129,13 @@ export function ClashConfigForm({ config, onSuccess }: ClashConfigFormProps) {
         <FormField
           control={form.control}
           name="globalConfig"
-          render={({ field }) => (
+          render={({ field: { value, ...field } }) => (
             <FormItem>
               <FormLabel>全局配置</FormLabel>
               <FormControl>
                 <Textarea
                   {...field}
+                  value={value ?? ""}
                   placeholder="# YAML 格式"
                   className="font-mono"
                   rows={10}
@@ -101,12 +148,13 @@ export function ClashConfigForm({ config, onSuccess }: ClashConfigFormProps) {
         <FormField
           control={form.control}
           name="rules"
-          render={({ field }) => (
+          render={({ field: { value, ...field } }) => (
             <FormItem>
               <FormLabel>规则</FormLabel>
               <FormControl>
                 <Textarea
                   {...field}
+                  value={value ?? ""}
                   placeholder="# YAML 格式"
                   className="font-mono"
                   rows={10}
