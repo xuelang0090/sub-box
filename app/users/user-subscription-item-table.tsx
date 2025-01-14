@@ -29,7 +29,7 @@ import { IdBadge } from "@/components/id-badge"
 import { DateTime } from "@/components/date-time"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { UrlDisplay } from "@/components/url-display"
+import { CollapseDisplay } from "@/components/collapse-display"
 
 import { deleteSubscriptionSourceItem } from "../subscriptions/actions"
 import { SubscriptionSourceItemForm } from "../subscriptions/subscription-source-item-form"
@@ -98,7 +98,7 @@ export function UserSubscriptionItemTable({ userId, items, sources }: UserSubscr
                       <TableCell><IdBadge id={item.id} /></TableCell>
                       <TableCell>{source?.name || '-'}</TableCell>
                       <TableCell>
-                        <UrlDisplay url={item.url} />
+                        <CollapseDisplay url={item.url} />
                       </TableCell>
                       <TableCell>{item.enable ? '启用' : '禁用'}</TableCell>
                       <TableCell>

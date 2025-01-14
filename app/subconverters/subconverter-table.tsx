@@ -27,7 +27,7 @@ import { PopupSheet } from "@/components/popup-sheet"
 import { type Subconverter } from "@/types"
 import { IdBadge } from "@/components/id-badge"
 import { DateTime } from "@/components/date-time"
-import { UrlDisplay } from "@/components/url-display"
+import { CollapseDisplay } from "@/components/collapse-display"
 
 import { deleteSubconverter } from "./actions"
 import { SubconverterForm } from "./subconverter-form"
@@ -78,7 +78,7 @@ export function SubconverterTable({ subconverters }: SubconverterTableProps) {
               <TableRow key={item.id}>
                 <TableCell><IdBadge id={item.id} /></TableCell>
                 <TableCell>{item.url}</TableCell>
-                <TableCell><UrlDisplay url={item.options} maxLength={50} /></TableCell>
+                <TableCell><CollapseDisplay url={item.options} maxLength={50} /></TableCell>
                 <TableCell><DateTime date={item.createdAt} /></TableCell>
                 <TableCell><DateTime date={item.updatedAt} /></TableCell>
                 <TableCell>

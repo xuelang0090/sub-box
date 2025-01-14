@@ -10,12 +10,12 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 
-interface UrlDisplayProps {
+interface CollapseDisplayProps {
   url: string
   maxLength?: number
 }
 
-export function UrlDisplay({ url, maxLength = 50 }: UrlDisplayProps) {
+export function CollapseDisplay({ url, maxLength = 50 }: CollapseDisplayProps) {
   const [showTooltip, setShowTooltip] = useState(false)
   const [copied, setCopied] = useState(false)
 
@@ -77,4 +77,4 @@ export function UrlDisplay({ url, maxLength = 50 }: UrlDisplayProps) {
   )
 }
 
-export type { UrlDisplayProps } 
+export type { CollapseDisplayProps } 
