@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation"
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -14,6 +15,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 interface NavItem {
   title: string
@@ -76,6 +78,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter className="flex justify-center">
+        <ThemeToggle />
+      </SidebarFooter>
       <SidebarRail />
     </Sidebar>
   )

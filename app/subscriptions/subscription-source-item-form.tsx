@@ -88,22 +88,17 @@ export function SubscriptionSourceItemForm({ userId, sources, users, item, onSuc
   function onSubmit(data: FormData) {
     startTransition(async () => {
       try {
-        const submitData = {
-          ...data,
-        }
         if (item) {
-          await updateSubscriptionSourceItem(item.id, submitData)
+          await updateSubscriptionSourceItem(item.id, data)
         } else {
-          await createSubscriptionSourceItem(submitData)
+          await createSubscriptionSourceItem(data)
         }
 
         toast("保存成功")
         
         onSuccess?.()
       } catch (error) {
-        toast("保存失败", {
-          description: (error as Error).message,
-        })
+        toast.error((error as Error).message)
       }
     })
   }

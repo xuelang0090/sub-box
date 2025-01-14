@@ -70,14 +70,15 @@ export function UserForm({ user, onSuccess }: UserFormProps) {
   function onSubmit(data: FormData) {
     startTransition(async () => {
       try {
+        const submitData = {
+          ...data,
+          subconverterId: data.subconverterId || null,
+          mergeConfigId: data.mergeConfigId || null,
+        }
         if (user) {
-          await updateUser(user.id, data)
+          await updateUser(user.id, submitData)
         } else {
-          await createUser({
-            ...data,
-            subconverterId: data.subconverterId || null,
-            mergeConfigId: data.mergeConfigId || null,
-          })
+          await createUser(submitData)
         }
 
         toast("保存成功")

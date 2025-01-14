@@ -5,10 +5,6 @@ import { userService } from "@/server/services/user-service"
 import { subconverterService } from "@/server/services/subconverter-service"
 import { clashConfigService } from "@/server/services/clash-config-service"
 import type { User } from "@/types"
-import db from "@/server/db"
-import { users } from "@/server/db/schema"
-import { eq } from "drizzle-orm"
-import { nanoid } from "nanoid"
 
 export async function getUsers() {
   return userService.getAll()
@@ -22,24 +18,16 @@ export async function getClashConfigs() {
   return clashConfigService.getAll()
 }
 
-export async function createUser(data: Omit<typeof users.$inferInsert, "id" | "createdAt" | "updatedAt">) {
-  const now = new Date().toISOString()
-  return await db.insert(users).values({
-    id: nanoid(),
-    ...data,
-    createdAt: now,
-    updatedAt: now,
-  })
+export async function createUser(data: Omit<User, "id" | "createdAt" | "updatedAt">) {
+  const user = await userService.create(data)
+  revalidatePath("/users")
+  return user
 }
 
-export async function updateUser(id: string, data: Omit<typeof users.$inferInsert, "id" | "createdAt" | "updatedAt">) {
-  const now = new Date().toISOString()
-  return await db.update(users)
-    .set({
-      ...data,
-      updatedAt: now,
-    })
-    .where(eq(users.id, id))
+export async function updateUser(id: string, data: Partial<Omit<User, "id" | "createdAt" | "updatedAt">>) {
+  const user = await userService.update(id, data)
+  revalidatePath("/users")
+  return user
 }
 
 export async function deleteUser(id: string) {
