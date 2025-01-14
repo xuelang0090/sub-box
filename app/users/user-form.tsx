@@ -15,15 +15,23 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { useToast } from "@/components/ui/use-toast"
-import { type User } from "@/types"
+import { type User, type Subconverter, type ClashConfig } from "@/types"
 
-import { createUser, updateUser } from "./actions"
+import { createUser, updateUser, getSubconverters, getClashConfigs } from "./actions"
+import { useEffect, useState } from "react"
 
 const formSchema = z.object({
   name: z.string().min(1, "名称不能为空"),
-  subconverterId: z.string().optional(),
-  mergeConfigId: z.string().optional(),
+  subconverterId: z.string().nullable(),
+  mergeConfigId: z.string().nullable(),
 })
 
 type FormData = z.infer<typeof formSchema>
@@ -36,13 +44,27 @@ interface UserFormProps {
 export function UserForm({ user, onSuccess }: UserFormProps) {
   const { toast } = useToast()
   const [isPending, startTransition] = useTransition()
+  const [subconverters, setSubconverters] = useState<Subconverter[]>([])
+  const [clashConfigs, setClashConfigs] = useState<ClashConfig[]>([])
+
+  useEffect(() => {
+    const loadData = async () => {
+      const [subconvertersData, clashConfigsData] = await Promise.all([
+        getSubconverters(),
+        getClashConfigs(),
+      ])
+      setSubconverters(subconvertersData)
+      setClashConfigs(clashConfigsData)
+    }
+    loadData()
+  }, [])
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: user?.name ?? "",
-      subconverterId: user?.subconverterId ?? "",
-      mergeConfigId: user?.mergeConfigId ?? "",
+      subconverterId: user?.subconverterId ?? null,
+      mergeConfigId: user?.mergeConfigId ?? null,
     },
   })
 
@@ -52,7 +74,11 @@ export function UserForm({ user, onSuccess }: UserFormProps) {
         if (user) {
           await updateUser(user.id, data)
         } else {
-          await createUser(data)
+          await createUser({
+            ...data,
+            subconverterId: data.subconverterId || null,
+            mergeConfigId: data.mergeConfigId || null,
+          })
         }
 
         toast({
@@ -91,9 +117,24 @@ export function UserForm({ user, onSuccess }: UserFormProps) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>订阅转换器</FormLabel>
-              <FormControl>
-                <Input {...field} placeholder="可选" />
-              </FormControl>
+              <Select
+                value={field.value || "none"}
+                onValueChange={(value) => field.onChange(value === "none" ? null : value)}
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="选择订阅转换器" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem key="none" value="none">无</SelectItem>
+                  {subconverters.map((item) => (
+                    <SelectItem key={item.id} value={item.id}>
+                      {item.url}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}
@@ -104,9 +145,24 @@ export function UserForm({ user, onSuccess }: UserFormProps) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Clash 配置</FormLabel>
-              <FormControl>
-                <Input {...field} placeholder="可选" />
-              </FormControl>
+              <Select
+                value={field.value || "none"}
+                onValueChange={(value) => field.onChange(value === "none" ? null : value)}
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="选择 Clash 配置" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem key="none" value="none">无</SelectItem>
+                  {clashConfigs.map((item) => (
+                    <SelectItem key={item.id} value={item.id}>
+                      {item.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}

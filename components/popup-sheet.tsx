@@ -28,7 +28,7 @@ export function PopupSheet({
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
-        className="w-[400px] sm:w-[540px]"
+        className="!w-[600px] sm:!w-[720px] !max-w-none"
         aria-describedby={description ? "sheet-description" : undefined}
       >
         <SheetHeader>
