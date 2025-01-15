@@ -5,6 +5,7 @@ import { Edit2, Trash2 } from "lucide-react";
 
 import { CollapseDisplay } from "@/components/collapse-display";
 import { DateTime } from "@/components/date-time";
+import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { IdBadge } from "@/components/id-badge";
 import { Button } from "@/components/ui/button";
 import { type User } from "@/types";
@@ -40,41 +41,67 @@ export function createColumns({ baseUrl, onEdit, onDelete }: CreateColumnsOption
   return [
     {
       accessorKey: "id",
-      header: "ID",
+      header: ({ column }) => <DataTableColumnHeader column={column} title="ID" />,
       cell: ({ row }) => <IdBadge id={row.original.id} />,
+      meta: {
+        title: "ID",
+      },
     },
     {
       accessorKey: "name",
-      header: "名称",
+      header: ({ column }) => <DataTableColumnHeader column={column} title="名称" />,
+      meta: {
+        title: "名称",
+      },
     },
     {
       accessorKey: "subscriptionKey",
-      header: "订阅链接",
+      header: ({ column }) => <DataTableColumnHeader column={column} title="订阅链接" />,
       cell: ({ row }) => baseUrl && <CollapseDisplay url={`${baseUrl}/sub/${row.original.subscriptionKey}`} />,
+      meta: {
+        title: "订阅链接",
+      },
     },
     {
       accessorKey: "subconverterId",
-      header: "订阅转换器",
+      header: ({ column }) => <DataTableColumnHeader column={column} title="订阅转换器" />,
       cell: ({ row }) => (row.original.subconverterId ? <IdBadge id={row.original.subconverterId} /> : "-"),
+      meta: {
+        title: "订阅转换器",
+      },
     },
     {
       accessorKey: "mergeConfigId",
-      header: "Clash 配置",
+      header: ({ column }) => <DataTableColumnHeader column={column} title="Clash 配置" />,
       cell: ({ row }) => (row.original.mergeConfigId ? <IdBadge id={row.original.mergeConfigId} /> : "-"),
+      meta: {
+        title: "Clash 配置",
+      },
     },
     {
       accessorKey: "createdAt",
-      header: "创建时间",
+      header: ({ column }) => <DataTableColumnHeader column={column} title="创建时间" />,
       cell: ({ row }) => <DateTime date={row.original.createdAt} />,
+      meta: {
+        title: "创建时间",
+      },
     },
     {
       accessorKey: "updatedAt",
-      header: "更新时间",
+      header: ({ column }) => <DataTableColumnHeader column={column} title="更新时间" />,
       cell: ({ row }) => <DateTime date={row.original.updatedAt} />,
+      meta: {
+        title: "更新时间",
+      },
     },
     {
       id: "actions",
+      header: "操作",
       cell: ({ row }) => <UserActions user={row.original} onEdit={onEdit} onDelete={onDelete} />,
+      meta: {
+        title: "操作",
+      },
+      enableHiding: false,
     },
   ];
 } 
