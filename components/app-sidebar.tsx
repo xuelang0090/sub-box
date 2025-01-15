@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { Cog, FileJson, Home, Link2, LogOut, Users, type LucideIcon } from "lucide-react";
+import { Box, Cog, FileJson, Home, Link2, LogOut, Users, ExternalLink, type LucideIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -18,11 +18,13 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface NavItem {
   title: string;
   href: string;
   icon: LucideIcon;
+  external?: boolean;
 }
 
 const navItems: NavItem[] = [
@@ -53,7 +55,22 @@ const navItems: NavItem[] = [
   },
 ];
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+const docItems: NavItem[] = [
+  {
+    title: "文档",
+    href: "https://github.com/moezx/sub-box",
+    icon: ExternalLink,
+    external: true,
+  },
+  {
+    title: "API",
+    href: "https://github.com/moezx/sub-box/wiki/API",
+    icon: ExternalLink,
+    external: true,
+  },
+];
+
+export function AppSidebar({ className, ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -75,16 +92,57 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   }
 
   return (
-    <Sidebar {...props}>
+    <Sidebar className={cn("group/sidebar", className)} {...props}>
       <SidebarContent>
+        <SidebarGroup className="pb-0">
+          <SidebarMenu>
+            {/* <SidebarMenuItem>
+              <SidebarMenuButton asChild> */}
+                <div className="flex items-center gap-2 my-4 mx-2">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                    <Box className="h-5 w-5" />
+                  </div>
+                  <div className="grid flex-1 text-sm leading-tight">
+                    <span className="font-semibold">Sub Box</span>
+                    <span className="text-xs text-muted-foreground">订阅管理</span>
+                  </div>
+                </div>
+              {/* </SidebarMenuButton>
+            </SidebarMenuItem> */}
+          </SidebarMenu>
+        </SidebarGroup>
         <SidebarGroup>
           <SidebarGroupLabel>管理面板</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {navItems.map((item) => (
                 <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton asChild isActive={pathname === item.href}>
+                  <SidebarMenuButton 
+                    asChild 
+                    isActive={pathname === item.href}
+                    tooltip={item.title}
+                  >
                     <a href={item.href}>
+                      <item.icon className="h-4 w-4" />
+                      <span>{item.title}</span>
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>文档</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {docItems.map((item) => (
+                <SidebarMenuItem key={item.href}>
+                  <SidebarMenuButton 
+                    asChild 
+                    tooltip={item.title}
+                  >
+                    <a href={item.href} target="_blank" rel="noopener noreferrer">
                       <item.icon className="h-4 w-4" />
                       <span>{item.title}</span>
                     </a>
@@ -97,7 +155,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
       <SidebarFooter className="!flex-row justify-between px-2">
         <ThemeToggle />
-        <Button variant="ghost" size="icon" onClick={handleLogout}>
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={handleLogout}
+          className="group-data-[collapsible=icon]/sidebar:w-10 group-data-[collapsible=icon]/sidebar:px-0"
+        >
           <LogOut className="h-4 w-4" />
           <span className="sr-only">退出登录</span>
         </Button>
