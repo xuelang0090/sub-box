@@ -3,9 +3,9 @@ import "server-only";
 import { eq } from "drizzle-orm";
 
 import db from "../db";
-import { subscriptionSourceItems, users } from "../db/schema";
+import { nodeClients, users } from "../db/schema";
 import { subconverterService } from "./subconverter-service";
-import { subscriptionSourceItemService } from "./subscription-source-item-service";
+import { nodeClientService } from "./node-client-service";
 import { userService } from "./user-service";
 
 class SubscriptionService {
@@ -18,12 +18,12 @@ class SubscriptionService {
       throw new Error("User not found");
     }
 
-    // Get all enabled subscription source items for the user
-    const sourceItems = await db.select().from(subscriptionSourceItems).where(eq(subscriptionSourceItems.userId, user.id));
+    // Get all enabled node clients for the user
+    const clients = await db.select().from(nodeClients).where(eq(nodeClients.userId, user.id));
 
-    const enabledItems = sourceItems.filter((item) => item.enable);
-    if (enabledItems.length === 0) {
-      throw new Error("No enabled subscription sources found");
+    const enabledClients = clients.filter((client) => client.enable);
+    if (enabledClients.length === 0) {
+      throw new Error("No enabled nodes found");
     }
 
     // Get subconverter - either user's or default one
@@ -42,7 +42,7 @@ class SubscriptionService {
     }
 
     // Construct URLs
-    const urls = enabledItems.map((item) => encodeURIComponent(item.url)).join("|");
+    const urls = enabledClients.map((client) => encodeURIComponent(client.url)).join("|");
     const baseUrl = `${subconverter.url}/sub?target=clash&url=${urls}`;
 
     // Add options if any

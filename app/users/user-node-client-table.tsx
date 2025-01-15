@@ -18,30 +18,29 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { type SubscriptionSource, type SubscriptionSourceItem } from "@/types";
-import { deleteSubscriptionSourceItem } from "../subscriptions/actions";
-import { SubscriptionSourceItemForm } from "../subscriptions/subscription-source-item-form";
+import { type Node, type NodeClient } from "@/types";
+import { deleteNodeClient } from "../nodes/actions";
+import { NodeClientForm } from "../nodes/node-client-form";
 
-interface UserSubscriptionItemTableProps {
+interface UserNodeClientTableProps {
   userId: string;
-  items: SubscriptionSourceItem[];
-  sources: SubscriptionSource[];
+  items: NodeClient[];
+  nodes: Node[];
 }
 
-export function UserSubscriptionItemTable({ userId, items, sources }: UserSubscriptionItemTableProps) {
-  const [editingItem, setEditingItem] = useState<SubscriptionSourceItem | null>(null);
-  const [deletingItem, setDeletingItem] = useState<SubscriptionSourceItem | null>(null);
+export function UserNodeClientTable({ userId, items, nodes }: UserNodeClientTableProps) {
+  const [editingItem, setEditingItem] = useState<NodeClient | null>(null);
+  const [deletingItem, setDeletingItem] = useState<NodeClient | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [isPending, startTransition] = useTransition();
 
-  function onDelete(item: SubscriptionSourceItem) {
+  function onDelete(item: NodeClient) {
     startTransition(async () => {
       try {
-        await deleteSubscriptionSourceItem(item.id);
+        await deleteNodeClient(item.id);
         toast("删除成功");
         setDeletingItem(null);
       } catch (error) {
@@ -58,7 +57,7 @@ export function UserSubscriptionItemTable({ userId, items, sources }: UserSubscr
         <div className="flex mb-4">
           <Button variant="outline" size="sm" onClick={() => setIsCreating(true)}>
             <PlusCircle className="mr-2 h-4 w-4" />
-            添加订阅源项目
+            添加客户端
           </Button>
         </div>
 
@@ -67,10 +66,9 @@ export function UserSubscriptionItemTable({ userId, items, sources }: UserSubscr
             <TableHeader>
               <TableRow>
                 <TableHead>ID</TableHead>
-                <TableHead>订阅源</TableHead>
+                <TableHead>节点</TableHead>
                 <TableHead>URL</TableHead>
                 <TableHead>状态</TableHead>
-                <TableHead>最新</TableHead>
                 <TableHead>更新时间</TableHead>
                 <TableHead className="w-[100px]">操作</TableHead>
               </TableRow>
@@ -78,26 +76,23 @@ export function UserSubscriptionItemTable({ userId, items, sources }: UserSubscr
             <TableBody>
               {items.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="h-24 text-center">
+                  <TableCell colSpan={6} className="h-24 text-center">
                     暂无数据
                   </TableCell>
                 </TableRow>
               ) : (
                 items.map((item) => {
-                  const source = sources.find((s) => s.id === item.subscriptionSourceId);
+                  const node = nodes.find((n) => n.id === item.nodeId);
                   return (
                     <TableRow key={item.id}>
                       <TableCell>
                         <IdBadge id={item.id} />
                       </TableCell>
-                      <TableCell>{source?.name || "-"}</TableCell>
+                      <TableCell>{node?.name || "-"}</TableCell>
                       <TableCell>
                         <CollapseDisplay url={item.url} />
                       </TableCell>
                       <TableCell>{item.enable ? "启用" : "禁用"}</TableCell>
-                      <TableCell>
-                        <Badge variant={item.upToDate ? "success" : "destructive"}>{item.upToDate ? "是" : "否"}</Badge>
-                      </TableCell>
                       <TableCell>
                         <DateTime date={item.updatedAt} />
                       </TableCell>
@@ -130,11 +125,11 @@ export function UserSubscriptionItemTable({ userId, items, sources }: UserSubscr
             setIsCreating(false);
           }
         }}
-        title={editingItem ? "编辑订阅源项目" : "添加订阅源项目"}
+        title={editingItem ? "编辑客户端" : "添加客户端"}
       >
-        <SubscriptionSourceItemForm
+        <NodeClientForm
           userId={userId}
-          sources={sources}
+          nodes={nodes}
           item={editingItem ?? undefined}
           onSuccess={() => {
             setEditingItem(null);
@@ -147,7 +142,7 @@ export function UserSubscriptionItemTable({ userId, items, sources }: UserSubscr
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>确认删除</AlertDialogTitle>
-            <AlertDialogDescription>确定要删除此订阅源项目吗？此操作不可撤销。</AlertDialogDescription>
+            <AlertDialogDescription>确定要删除此客户端吗？此操作不可撤销。</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>取消</AlertDialogCancel>

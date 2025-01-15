@@ -11,72 +11,74 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { type SubscriptionSource, type SubscriptionSourceItem, type User } from "@/types";
-import { createSubscriptionSourceItem, updateSubscriptionSourceItem } from "./actions";
+import { type Node, type NodeClient, type User } from "@/types";
+import { createNodeClient, updateNodeClient } from "./actions";
 
 const formSchema = z.object({
   userId: z.string().min(1, "用户不能为空"),
-  subscriptionSourceId: z.string().min(1, "订阅源不能为空"),
+  nodeId: z.string().min(1, "节点不能为空"),
   url: z.string().min(1, "URL不能为空"), // 不需要检查 url 是否是有效，因为可能有 vless:// 等格式
   enable: z.boolean(),
-  upToDate: z.boolean(),
 });
 
 type FormData = z.infer<typeof formSchema>;
 
-interface SubscriptionSourceItemFormProps {
+interface NodeClientFormProps {
   userId?: string;
-  sources: SubscriptionSource[];
+  nodes: Node[];
   users?: User[];
-  item?: SubscriptionSourceItem;
+  item?: NodeClient;
   onSuccess?: () => void;
 }
 
-export function SubscriptionSourceItemForm({ userId, sources, users, item, onSuccess }: SubscriptionSourceItemFormProps) {
+export function NodeClientForm({ userId, nodes, users, item, onSuccess }: NodeClientFormProps) {
   const [isPending, startTransition] = useTransition();
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       userId: item?.userId ?? userId ?? "",
-      subscriptionSourceId: item?.subscriptionSourceId ?? "",
+      nodeId: item?.nodeId ?? "",
       url: item?.url ?? "",
       enable: item?.enable ?? true,
-      upToDate: item?.upToDate ?? true,
     },
   });
 
-  const selectedSource = sources.find((s) => s.id === form.watch("subscriptionSourceId"));
+  const selectedNode = nodes.find((n) => n.id === form.watch("nodeId"));
 
-  const replaceIpInUrl = () => {
+  const replaceHostInUrl = () => {
     const currentUrl = form.getValues("url");
     if (!currentUrl) {
       toast("URL不能为空");
       return;
     }
-    if (!selectedSource?.ip) {
-      toast("订阅源IP不能为空");
+    if (!selectedNode?.host) {
+      toast("节点主机不能为空");
       return;
     }
 
     const match = currentUrl.match(/@([^:]+):/);
     if (!match) {
-      toast("URL格式不正确，未找到可替换的IP");
+      toast("URL格式不正确，未找到可替换的主机");
       return;
     }
 
-    const newUrl = currentUrl.replace(/@([^:]+):/, `@${selectedSource.ip}:`);
+    const newUrl = currentUrl.replace(/@([^:]+):/, `@${selectedNode.host}:`);
     form.setValue("url", newUrl);
-    toast("IP已替换");
+    toast("主机已替换");
   };
 
   function onSubmit(data: FormData) {
     startTransition(async () => {
       try {
+        const submitData = {
+          ...data,
+          clientId: null,
+        };
         if (item) {
-          await updateSubscriptionSourceItem(item.id, data);
+          await updateNodeClient(item.id, submitData);
         } else {
-          await createSubscriptionSourceItem(data);
+          await createNodeClient(submitData);
         }
 
         toast("保存成功");
@@ -119,20 +121,20 @@ export function SubscriptionSourceItemForm({ userId, sources, users, item, onSuc
         )}
         <FormField
           control={form.control}
-          name="subscriptionSourceId"
+          name="nodeId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>订阅源</FormLabel>
+              <FormLabel>节点</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="选择订阅源" />
+                    <SelectValue placeholder="选择节点" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {sources.map((source) => (
-                    <SelectItem key={source.id} value={source.id}>
-                      {source.name}
+                  {nodes.map((node) => (
+                    <SelectItem key={node.id} value={node.id}>
+                      {node.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -148,8 +150,8 @@ export function SubscriptionSourceItemForm({ userId, sources, users, item, onSuc
             <FormItem>
               <div className="flex items-center justify-between">
                 <FormLabel>URL</FormLabel>
-                <Button type="button" variant="ghost" size="sm" className="h-6 text-xs" onClick={replaceIpInUrl}>
-                  覆盖IP
+                <Button type="button" variant="ghost" size="sm" className="h-6 text-xs" onClick={replaceHostInUrl}>
+                  覆盖主机
                 </Button>
               </div>
               <FormControl>
@@ -166,20 +168,6 @@ export function SubscriptionSourceItemForm({ userId, sources, users, item, onSuc
             <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
               <div className="space-y-0.5">
                 <FormLabel className="text-base">启用</FormLabel>
-              </div>
-              <FormControl>
-                <Switch checked={field.value} onCheckedChange={field.onChange} />
-              </FormControl>
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="upToDate"
-          render={({ field }) => (
-            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-              <div className="space-y-0.5">
-                <FormLabel className="text-base">设为最新</FormLabel>
               </div>
               <FormControl>
                 <Switch checked={field.value} onCheckedChange={field.onChange} />

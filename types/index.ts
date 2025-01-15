@@ -1,6 +1,6 @@
 import { InferSelectModel } from "drizzle-orm";
 
-import { clashConfigs, subconverters, subscriptionSourceItems, subscriptionSources, users } from "@/server/db/schema";
+import { clashConfigs, subconverters, nodeClients, nodes, users } from "@/server/db/schema";
 
 // User Model
 export type User = InferSelectModel<typeof users>;
@@ -14,8 +14,8 @@ export interface Subconverter extends Omit<SubconverterRow, "options"> {
 // Clash Config Model
 export type ClashConfig = InferSelectModel<typeof clashConfigs>;
 
-// Subscription Source Model
-export type SubscriptionSource = InferSelectModel<typeof subscriptionSources>;
+// Node Model
+export type Node = InferSelectModel<typeof nodes>;
 
-// Subscription Source Item Model
-export type SubscriptionSourceItem = InferSelectModel<typeof subscriptionSourceItems>;
+// Node Client Model
+export type NodeClient = InferSelectModel<typeof nodeClients>;

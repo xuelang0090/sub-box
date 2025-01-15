@@ -23,27 +23,27 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { type SubscriptionSource, type SubscriptionSourceItem, type User } from "@/types";
-import { deleteSubscriptionSourceItem } from "./actions";
-import { SubscriptionSourceItemForm } from "./subscription-source-item-form";
+import { type Node, type NodeClient, type User } from "@/types";
+import { deleteNodeClient } from "./actions";
+import { NodeClientForm } from "./node-client-form";
 
-interface SubscriptionSourceItemTableProps {
-  items: SubscriptionSourceItem[];
-  sourceId: string;
-  source: SubscriptionSource;
+interface NodeClientTableProps {
+  items: NodeClient[];
+  nodeId: string;
+  node: Node;
   users: User[];
 }
 
-export function SubscriptionSourceItemTable({ items, sourceId: _, source, users }: SubscriptionSourceItemTableProps) {
-  const [editingItem, setEditingItem] = useState<SubscriptionSourceItem | null>(null);
-  const [deletingItem, setDeletingItem] = useState<SubscriptionSourceItem | null>(null);
+export function NodeClientTable({ items, nodeId: _, node, users }: NodeClientTableProps) {
+  const [editingItem, setEditingItem] = useState<NodeClient | null>(null);
+  const [deletingItem, setDeletingItem] = useState<NodeClient | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [isPending, startTransition] = useTransition();
 
-  function onDelete(item: SubscriptionSourceItem) {
+  function onDelete(item: NodeClient) {
     startTransition(async () => {
       try {
-        await deleteSubscriptionSourceItem(item.id);
+        await deleteNodeClient(item.id);
         toast("删除成功");
         setDeletingItem(null);
       } catch (error) {
@@ -60,7 +60,7 @@ export function SubscriptionSourceItemTable({ items, sourceId: _, source, users 
         <div className="flex mb-4">
           <Button variant="outline" size="sm" onClick={() => setIsCreating(true)}>
             <PlusCircle className="mr-2 h-4 w-4" />
-            添加订阅源项目
+            添加客户端
           </Button>
         </div>
 
@@ -72,7 +72,6 @@ export function SubscriptionSourceItemTable({ items, sourceId: _, source, users 
                 <TableHead>用户</TableHead>
                 <TableHead>URL</TableHead>
                 <TableHead>状态</TableHead>
-                <TableHead>最新</TableHead>
                 <TableHead>更新时间</TableHead>
                 <TableHead className="w-[100px]">操作</TableHead>
               </TableRow>
@@ -95,9 +94,6 @@ export function SubscriptionSourceItemTable({ items, sourceId: _, source, users 
                       <CollapseDisplay url={item.url} />
                     </TableCell>
                     <TableCell>{item.enable ? "启用" : "禁用"}</TableCell>
-                    <TableCell>
-                      <Badge variant={item.upToDate ? "success" : "destructive"}>{item.upToDate ? "是" : "否"}</Badge>
-                    </TableCell>
                     <TableCell>
                       <DateTime date={item.updatedAt} />
                     </TableCell>
@@ -129,10 +125,10 @@ export function SubscriptionSourceItemTable({ items, sourceId: _, source, users 
             setIsCreating(false);
           }
         }}
-        title={editingItem ? "编辑订阅源项目" : "添加订阅源项目"}
+        title={editingItem ? "编辑客户端" : "添加客户端"}
       >
-        <SubscriptionSourceItemForm
-          sources={[source]}
+        <NodeClientForm
+          nodes={[node]}
           users={users}
           item={editingItem ?? undefined}
           onSuccess={() => {
@@ -146,7 +142,7 @@ export function SubscriptionSourceItemTable({ items, sourceId: _, source, users 
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>确认删除</AlertDialogTitle>
-            <AlertDialogDescription>确定要删除此订阅源项目吗？此操作不可撤销。</AlertDialogDescription>
+            <AlertDialogDescription>确定要删除此客户端吗？此操作不可撤销。</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>取消</AlertDialogCancel>

@@ -50,37 +50,58 @@ export const clashConfigs = sqliteTable("clash_configs", {
   updatedAt: text("updated_at").notNull(),
 });
 
-// Subscription Source table
-export const subscriptionSources = sqliteTable("subscription_sources", {
+// before modfy:
+
+// export const subscriptionSources = sqliteTable("subscription_sources", {
+//   id: text("id").primaryKey(),
+//   name: text("name").notNull(),
+//   inboundProtocol: text("inbound_protocol").notNull(),
+//   ip: text("ip"), // --> host
+//   url: text("url"), // --> accessUrl
+//   createdAt: text("created_at").notNull(),
+//   updatedAt: text("updated_at").notNull(),
+// });
+export const nodes = sqliteTable("nodes", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
-  inboundProtocol: text("inbound_protocol").notNull(),
-  ip: text("ip"),
-  url: text("url"),
+  type: text("type").notNull().default("custom"), // 3x-ui, external-subscription, custom
+  host: text("host"),
+  accessUrl: text("access_url"),
   createdAt: text("created_at").notNull(),
   updatedAt: text("updated_at").notNull(),
 });
 
-// Subscription Source Item table
-export const subscriptionSourceItems = sqliteTable("subscription_source_items", {
+// before modify:
+
+// export const subscriptionSourceItems = sqliteTable("subscription_source_items", {
+//   id: text("id").primaryKey(),
+//   subscriptionSourceId: text("subscription_source_id").notNull(),
+//   userId: text("user_id").notNull(),
+//   enable: integer("enable", { mode: "boolean" }).notNull(),
+//   url: text("url").notNull(),
+//   upToDate: integer("up_to_date", { mode: "boolean" }).notNull(),
+//   createdAt: text("created_at").notNull(),
+//   updatedAt: text("updated_at").notNull(),
+// });
+export const nodeClients = sqliteTable("node_clients", {
   id: text("id").primaryKey(),
-  subscriptionSourceId: text("subscription_source_id").notNull(),
+  nodeId: text("node_id").notNull(),
   userId: text("user_id").notNull(),
+  clientId: text("client_id"),
   enable: integer("enable", { mode: "boolean" }).notNull(),
   url: text("url").notNull(),
-  upToDate: integer("up_to_date", { mode: "boolean" }).notNull(),
   createdAt: text("created_at").notNull(),
   updatedAt: text("updated_at").notNull(),
 });
 
-// Subscription Source Item relations
-export const subscriptionSourceItemsRelations = relations(subscriptionSourceItems, ({ one }) => ({
-  subscriptionSource: one(subscriptionSources, {
-    fields: [subscriptionSourceItems.subscriptionSourceId],
-    references: [subscriptionSources.id],
+// Node Client relations
+export const nodeClientsRelations = relations(nodeClients, ({ one }) => ({
+  node: one(nodes, {
+    fields: [nodeClients.nodeId],
+    references: [nodes.id],
   }),
   user: one(users, {
-    fields: [subscriptionSourceItems.userId],
+    fields: [nodeClients.userId],
     references: [users.id],
   }),
 }));

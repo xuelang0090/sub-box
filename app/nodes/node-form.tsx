@@ -10,14 +10,14 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { type SubscriptionSource } from "@/types";
-import { createSubscriptionSource, updateSubscriptionSource } from "./actions";
+import { type Node } from "@/types";
+import { createNode, updateNode } from "./actions";
 
 const formSchema = z.object({
   name: z.string().min(1, "名称不能为空"),
-  inboundProtocol: z.string().min(1, "入站协议不能为空"),
-  ip: z.string().optional(),
-  url: z
+  type: z.string().min(1, "类型不能为空"),
+  host: z.string().optional(),
+  accessUrl: z
     .string()
     .refine((val) => !val || /^https?:\/\/.+/.test(val), "请输入有效的URL")
     .optional(),
@@ -25,21 +25,21 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
-interface SubscriptionSourceFormProps {
-  source?: SubscriptionSource;
+interface NodeFormProps {
+  node?: Node;
   onSuccess?: () => void;
 }
 
-export function SubscriptionSourceForm({ source, onSuccess }: SubscriptionSourceFormProps) {
+export function NodeForm({ node, onSuccess }: NodeFormProps) {
   const [isPending, startTransition] = useTransition();
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: source?.name ?? "",
-      inboundProtocol: source?.inboundProtocol ?? "",
-      ip: source?.ip ?? "",
-      url: source?.url ?? "",
+      name: node?.name ?? "",
+      type: node?.type ?? "",
+      host: node?.host ?? "",
+      accessUrl: node?.accessUrl ?? "",
     },
   });
 
@@ -48,13 +48,13 @@ export function SubscriptionSourceForm({ source, onSuccess }: SubscriptionSource
       try {
         const submitData = {
           ...data,
-          ip: data.ip || null,
-          url: data.url || null,
+          host: data.host || null,
+          accessUrl: data.accessUrl || null,
         };
-        if (source) {
-          await updateSubscriptionSource(source.id, submitData);
+        if (node) {
+          await updateNode(node.id, submitData);
         } else {
-          await createSubscriptionSource(submitData);
+          await createNode(submitData);
         }
 
         toast("保存成功");
@@ -84,21 +84,20 @@ export function SubscriptionSourceForm({ source, onSuccess }: SubscriptionSource
         />
         <FormField
           control={form.control}
-          name="inboundProtocol"
+          name="type"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>入站协议</FormLabel>
+              <FormLabel>类型</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="选择协议" />
+                    <SelectValue placeholder="选择类型" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="vmess">VMess</SelectItem>
-                  <SelectItem value="vless">VLESS</SelectItem>
-                  <SelectItem value="trojan">Trojan</SelectItem>
-                  <SelectItem value="shadowsocks">Shadowsocks</SelectItem>
+                  <SelectItem value="3x-ui">3X-UI</SelectItem>
+                  <SelectItem value="external-subscription">外部订阅</SelectItem>
+                  <SelectItem value="custom">自定义</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />
@@ -107,10 +106,10 @@ export function SubscriptionSourceForm({ source, onSuccess }: SubscriptionSource
         />
         <FormField
           control={form.control}
-          name="ip"
+          name="host"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>IP</FormLabel>
+              <FormLabel>主机</FormLabel>
               <FormControl>
                 <Input {...field} placeholder="可选" />
               </FormControl>
@@ -120,10 +119,10 @@ export function SubscriptionSourceForm({ source, onSuccess }: SubscriptionSource
         />
         <FormField
           control={form.control}
-          name="url"
+          name="accessUrl"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>URL</FormLabel>
+              <FormLabel>访问URL</FormLabel>
               <FormControl>
                 <Input {...field} placeholder="可选" />
               </FormControl>

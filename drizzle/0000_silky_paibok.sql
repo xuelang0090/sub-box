@@ -9,32 +9,32 @@ CREATE TABLE `clash_configs` (
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `clash_configs_key_unique` ON `clash_configs` (`key`);--> statement-breakpoint
+CREATE TABLE `node_clients` (
+	`id` text PRIMARY KEY NOT NULL,
+	`node_id` text NOT NULL,
+	`user_id` text NOT NULL,
+	`client_id` text,
+	`enable` integer NOT NULL,
+	`url` text NOT NULL,
+	`created_at` text NOT NULL,
+	`updated_at` text NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE `nodes` (
+	`id` text PRIMARY KEY NOT NULL,
+	`name` text NOT NULL,
+	`type` text DEFAULT 'custom' NOT NULL,
+	`host` text,
+	`access_url` text,
+	`created_at` text NOT NULL,
+	`updated_at` text NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE `subconverters` (
 	`id` text PRIMARY KEY NOT NULL,
 	`url` text NOT NULL,
 	`options` text NOT NULL,
 	`is_default` integer DEFAULT false NOT NULL,
-	`created_at` text NOT NULL,
-	`updated_at` text NOT NULL
-);
---> statement-breakpoint
-CREATE TABLE `subscription_source_items` (
-	`id` text PRIMARY KEY NOT NULL,
-	`subscription_source_id` text NOT NULL,
-	`user_id` text NOT NULL,
-	`enable` integer NOT NULL,
-	`url` text NOT NULL,
-	`up_to_date` integer NOT NULL,
-	`created_at` text NOT NULL,
-	`updated_at` text NOT NULL
-);
---> statement-breakpoint
-CREATE TABLE `subscription_sources` (
-	`id` text PRIMARY KEY NOT NULL,
-	`name` text NOT NULL,
-	`inbound_protocol` text NOT NULL,
-	`ip` text,
-	`url` text,
 	`created_at` text NOT NULL,
 	`updated_at` text NOT NULL
 );

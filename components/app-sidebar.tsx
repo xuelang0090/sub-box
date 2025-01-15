@@ -35,8 +35,8 @@ const navItems: NavItem[] = [
     icon: Users,
   },
   {
-    title: "订阅源管理",
-    href: "/subscriptions",
+    title: "节点管理",
+    href: "/nodes",
     icon: Link2,
   },
   {

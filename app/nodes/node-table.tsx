@@ -20,26 +20,26 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { type SubscriptionSource, type SubscriptionSourceItem, type User } from "@/types";
-import { deleteSubscriptionSource } from "./actions";
-import { SubscriptionSourceForm } from "./subscription-source-form";
-import { SubscriptionSourceItemTable } from "./subscription-source-item-table";
+import { type Node, type NodeClient, type User } from "@/types";
+import { deleteNode } from "./actions";
+import { NodeForm } from "./node-form";
+import { NodeClientTable } from "./node-client-table";
 
-interface SubscriptionSourceTableProps {
-  sources: (SubscriptionSource & { items: SubscriptionSourceItem[] })[];
+interface NodeTableProps {
+  nodes: (Node & { items: NodeClient[] })[];
   users: User[];
 }
 
-export function SubscriptionSourceTable({ sources, users }: SubscriptionSourceTableProps) {
-  const [editingItem, setEditingItem] = useState<SubscriptionSource | null>(null);
-  const [deletingItem, setDeletingItem] = useState<SubscriptionSource | null>(null);
-  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set(sources.map((source) => source.id)));
+export function NodeTable({ nodes, users }: NodeTableProps) {
+  const [editingItem, setEditingItem] = useState<Node | null>(null);
+  const [deletingItem, setDeletingItem] = useState<Node | null>(null);
+  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set(nodes.map((node) => node.id)));
   const [isPending, startTransition] = useTransition();
 
-  function onDelete(item: SubscriptionSource) {
+  function onDelete(item: Node) {
     startTransition(async () => {
       try {
-        await deleteSubscriptionSource(item.id);
+        await deleteNode(item.id);
         toast("删除成功");
         setDeletingItem(null);
       } catch (error) {
@@ -68,23 +68,23 @@ export function SubscriptionSourceTable({ sources, users }: SubscriptionSourceTa
             <TableHead className="w-[50px]"></TableHead>
             <TableHead>ID</TableHead>
             <TableHead>名称</TableHead>
-            <TableHead>入站协议</TableHead>
-            <TableHead>IP</TableHead>
-            <TableHead>URL</TableHead>
+            <TableHead>类型</TableHead>
+            <TableHead>主机</TableHead>
+            <TableHead>访问URL</TableHead>
             <TableHead>创建时间</TableHead>
             <TableHead>更新时间</TableHead>
             <TableHead className="w-[100px]">操作</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {sources.length === 0 ? (
+          {nodes.length === 0 ? (
             <TableRow>
               <TableCell colSpan={9} className="h-24 text-center">
                 暂无数据
               </TableCell>
             </TableRow>
           ) : (
-            sources.map((item) => (
+            nodes.map((item) => (
               <React.Fragment key={item.id}>
                 <TableRow>
                   <TableCell>
@@ -100,9 +100,9 @@ export function SubscriptionSourceTable({ sources, users }: SubscriptionSourceTa
                     <IdBadge id={item.id} />
                   </TableCell>
                   <TableCell>{item.name}</TableCell>
-                  <TableCell>{item.inboundProtocol}</TableCell>
-                  <TableCell>{item.ip || "-"}</TableCell>
-                  <TableCell>{item.url || "-"}</TableCell>
+                  <TableCell>{item.type}</TableCell>
+                  <TableCell>{item.host || "-"}</TableCell>
+                  <TableCell>{item.accessUrl || "-"}</TableCell>
                   <TableCell>
                     <DateTime date={item.createdAt} />
                   </TableCell>
@@ -125,7 +125,7 @@ export function SubscriptionSourceTable({ sources, users }: SubscriptionSourceTa
                 {expandedItems.has(item.id) && (
                   <TableRow>
                     <TableCell colSpan={6} className="p-0">
-                      <SubscriptionSourceItemTable sourceId={item.id} source={item} items={item.items} users={users} />
+                      <NodeClientTable nodeId={item.id} node={item} items={item.items} users={users} />
                     </TableCell>
                   </TableRow>
                 )}
@@ -135,15 +135,15 @@ export function SubscriptionSourceTable({ sources, users }: SubscriptionSourceTa
         </TableBody>
       </Table>
 
-      <PopupSheet open={Boolean(editingItem)} onOpenChange={(open) => !open && setEditingItem(null)} title="编辑订阅源">
-        <SubscriptionSourceForm source={editingItem ?? undefined} onSuccess={() => setEditingItem(null)} />
+      <PopupSheet open={Boolean(editingItem)} onOpenChange={(open) => !open && setEditingItem(null)} title="编辑节点">
+        <NodeForm node={editingItem ?? undefined} onSuccess={() => setEditingItem(null)} />
       </PopupSheet>
 
       <AlertDialog open={Boolean(deletingItem)} onOpenChange={(open) => !open && setDeletingItem(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>确认删除</AlertDialogTitle>
-            <AlertDialogDescription>确定要删除订阅源 {deletingItem?.name} 吗？此操作不可撤销。</AlertDialogDescription>
+            <AlertDialogDescription>确定要删除节点 {deletingItem?.name} 吗？此操作不可撤销。</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>取消</AlertDialogCancel>

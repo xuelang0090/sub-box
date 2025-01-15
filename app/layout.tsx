@@ -28,11 +28,11 @@ export const metadata = {
 function getStoredTheme(): string {
   try {
     const headersList = headers();
-    const cookie = headersList.get("cookie");
+    const cookie = headersList.get("cookie") ?? "";
     if (!cookie) return "system";
 
     const themeMatch = cookie.match(/theme=([^;]+)/);
-    return themeMatch ? themeMatch[1] : "system";
+    return themeMatch?.[1] ?? "system";
   } catch {
     return "system";
   }

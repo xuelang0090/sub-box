@@ -20,18 +20,18 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { type SubscriptionSource, type SubscriptionSourceItem, type User } from "@/types";
+import { type Node, type NodeClient, type User } from "@/types";
 import { deleteUser } from "./actions";
 import { UserForm } from "./user-form";
-import { UserSubscriptionItemTable } from "./user-subscription-item-table";
+import { UserNodeClientTable } from "./user-node-client-table";
 
 interface UserTableProps {
   users: User[];
-  items: SubscriptionSourceItem[];
-  sources: SubscriptionSource[];
+  items: NodeClient[];
+  nodes: Node[];
 }
 
-export function UserTable({ users, items, sources }: UserTableProps) {
+export function UserTable({ users, items, nodes }: UserTableProps) {
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [deletingUser, setDeletingUser] = useState<User | null>(null);
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
@@ -78,7 +78,7 @@ export function UserTable({ users, items, sources }: UserTableProps) {
       acc[userId].push(item);
       return acc;
     },
-    {} as Record<string, SubscriptionSourceItem[]>
+    {} as Record<string, NodeClient[]>
   );
 
   return (
@@ -146,7 +146,7 @@ export function UserTable({ users, items, sources }: UserTableProps) {
                 {expandedItems.has(user.id) && (
                   <TableRow>
                     <TableCell colSpan={8} className="p-0 pl-20">
-                      <UserSubscriptionItemTable userId={user.id} items={itemsByUser[user.id] || []} sources={sources} />
+                      <UserNodeClientTable userId={user.id} items={itemsByUser[user.id] || []} nodes={nodes} />
                     </TableCell>
                   </TableRow>
                 )}
