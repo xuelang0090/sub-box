@@ -49,3 +49,9 @@ public/worker-*.js.map
 
 data
 *.db
+
+.open-next
+.dev.vars
+wrangler.toml
+wrangler.json
+.wrangler
