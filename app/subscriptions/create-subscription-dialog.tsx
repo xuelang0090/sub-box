@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { PlusCircle } from 'lucide-react'
+import { useState } from "react";
+import { PlusCircle } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { PopupSheet } from "@/components/popup-sheet"
-import { SubscriptionSourceForm } from "./subscription-source-form"
+import { PopupSheet } from "@/components/popup-sheet";
+import { Button } from "@/components/ui/button";
+import { SubscriptionSourceForm } from "./subscription-source-form";
 
 export function CreateSubscriptionDialog() {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
 
   return (
     <>
@@ -17,13 +17,9 @@ export function CreateSubscriptionDialog() {
         添加订阅源
       </Button>
 
-      <PopupSheet
-        open={open}
-        onOpenChange={setOpen}
-        title="添加订阅源"
-      >
+      <PopupSheet open={open} onOpenChange={setOpen} title="添加订阅源">
         <SubscriptionSourceForm onSuccess={() => setOpen(false)} />
       </PopupSheet>
     </>
-  )
-} 
+  );
+}

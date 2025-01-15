@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { PlusCircle } from 'lucide-react'
+import { useState } from "react";
+import { PlusCircle } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { PopupSheet } from "@/components/popup-sheet"
-import { SubconverterForm } from "./subconverter-form"
+import { PopupSheet } from "@/components/popup-sheet";
+import { Button } from "@/components/ui/button";
+import { SubconverterForm } from "./subconverter-form";
 
 export function CreateSubconverterDialog() {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
 
   return (
     <>
@@ -17,13 +17,9 @@ export function CreateSubconverterDialog() {
         添加转换器
       </Button>
 
-      <PopupSheet
-        open={open}
-        onOpenChange={setOpen}
-        title="添加订阅转换器"
-      >
+      <PopupSheet open={open} onOpenChange={setOpen} title="添加订阅转换器">
         <SubconverterForm onSuccess={() => setOpen(false)} />
       </PopupSheet>
     </>
-  )
-} 
+  );
+}

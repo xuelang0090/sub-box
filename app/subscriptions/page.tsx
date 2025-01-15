@@ -1,14 +1,11 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { getSubscriptionSources } from "./actions"
-import { getUsers } from "../users/actions"
-import { SubscriptionSourceTable } from "./subscription-source-table"
-import { CreateSubscriptionDialog } from "./create-subscription-dialog"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getUsers } from "../users/actions";
+import { getSubscriptionSources } from "./actions";
+import { CreateSubscriptionDialog } from "./create-subscription-dialog";
+import { SubscriptionSourceTable } from "./subscription-source-table";
 
 export default async function SubscriptionsPage() {
-  const [sources, users] = await Promise.all([
-    getSubscriptionSources(),
-    getUsers(),
-  ])
+  const [sources, users] = await Promise.all([getSubscriptionSources(), getUsers()]);
 
   return (
     <Card>
@@ -20,6 +17,5 @@ export default async function SubscriptionsPage() {
         <SubscriptionSourceTable sources={sources} users={users} />
       </CardContent>
     </Card>
-  )
+  );
 }
-

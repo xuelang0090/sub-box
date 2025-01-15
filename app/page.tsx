@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function Home() {
   return (
@@ -10,6 +10,5 @@ export default function Home() {
         <p>这是一个管理和聚合订阅地址的服务。</p>
       </CardContent>
     </Card>
-  )
+  );
 }
-

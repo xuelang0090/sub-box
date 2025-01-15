@@ -1,10 +1,10 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { getClashConfigs } from "./actions"
-import { ClashConfigTable } from "./clash-config-table"
-import { CreateClashConfigDialog } from "./create-clash-config-dialog"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getClashConfigs } from "./actions";
+import { ClashConfigTable } from "./clash-config-table";
+import { CreateClashConfigDialog } from "./create-clash-config-dialog";
 
 export default async function ClashConfigsPage() {
-  const configs = await getClashConfigs()
+  const configs = await getClashConfigs();
 
   return (
     <Card>
@@ -16,6 +16,5 @@ export default async function ClashConfigsPage() {
         <ClashConfigTable configs={configs} />
       </CardContent>
     </Card>
-  )
+  );
 }
-

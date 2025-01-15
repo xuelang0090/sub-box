@@ -1,48 +1,37 @@
-"use client"
+"use client";
 
-import { useTransition } from "react"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
-import { toast } from "sonner"
+import { useTransition } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import * as z from "zod";
 
-import { Button } from "@/components/ui/button"
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { type SubscriptionSource } from "@/types"
-
-import { createSubscriptionSource, updateSubscriptionSource } from "./actions"
+import { Button } from "@/components/ui/button";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { type SubscriptionSource } from "@/types";
+import { createSubscriptionSource, updateSubscriptionSource } from "./actions";
 
 const formSchema = z.object({
   name: z.string().min(1, "名称不能为空"),
   inboundProtocol: z.string().min(1, "入站协议不能为空"),
   ip: z.string().optional(),
-  url: z.string().refine((val) => !val || /^https?:\/\/.+/.test(val), "请输入有效的URL").optional(),
-})
+  url: z
+    .string()
+    .refine((val) => !val || /^https?:\/\/.+/.test(val), "请输入有效的URL")
+    .optional(),
+});
 
-type FormData = z.infer<typeof formSchema>
+type FormData = z.infer<typeof formSchema>;
 
 interface SubscriptionSourceFormProps {
-  source?: SubscriptionSource
-  onSuccess?: () => void
+  source?: SubscriptionSource;
+  onSuccess?: () => void;
 }
 
 export function SubscriptionSourceForm({ source, onSuccess }: SubscriptionSourceFormProps) {
-  const [isPending, startTransition] = useTransition()
+  const [isPending, startTransition] = useTransition();
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -52,7 +41,7 @@ export function SubscriptionSourceForm({ source, onSuccess }: SubscriptionSource
       ip: source?.ip ?? "",
       url: source?.url ?? "",
     },
-  })
+  });
 
   function onSubmit(data: FormData) {
     startTransition(async () => {
@@ -61,20 +50,20 @@ export function SubscriptionSourceForm({ source, onSuccess }: SubscriptionSource
           ...data,
           ip: data.ip || null,
           url: data.url || null,
-        }
+        };
         if (source) {
-          await updateSubscriptionSource(source.id, submitData)
+          await updateSubscriptionSource(source.id, submitData);
         } else {
-          await createSubscriptionSource(submitData)
+          await createSubscriptionSource(submitData);
         }
 
-        toast("保存成功")
-        
-        onSuccess?.()
+        toast("保存成功");
+
+        onSuccess?.();
       } catch (error) {
-        toast.error((error as Error).message)
+        toast.error((error as Error).message);
       }
-    })
+    });
   }
 
   return (
@@ -147,5 +136,5 @@ export function SubscriptionSourceForm({ source, onSuccess }: SubscriptionSource
         </Button>
       </form>
     </Form>
-  )
-} 
+  );
+}

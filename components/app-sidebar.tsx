@@ -1,8 +1,9 @@
-"use client"
+"use client";
 
-import { type LucideIcon, Users, Link2, Cog, FileJson, Home } from 'lucide-react'
-import { usePathname } from "next/navigation"
+import { usePathname } from "next/navigation";
+import { Cog, FileJson, Home, Link2, Users, type LucideIcon } from "lucide-react";
 
+import { ThemeToggle } from "@/components/theme-toggle";
 import {
   Sidebar,
   SidebarContent,
@@ -14,13 +15,12 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-} from "@/components/ui/sidebar"
-import { ThemeToggle } from "@/components/theme-toggle"
+} from "@/components/ui/sidebar";
 
 interface NavItem {
-  title: string
-  href: string
-  icon: LucideIcon
+  title: string;
+  href: string;
+  icon: LucideIcon;
 }
 
 const navItems: NavItem[] = [
@@ -49,10 +49,10 @@ const navItems: NavItem[] = [
     href: "/clash-configs",
     icon: FileJson,
   },
-]
+];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   return (
     <Sidebar {...props}>
@@ -63,10 +63,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarMenu>
               {navItems.map((item) => (
                 <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={pathname === item.href}
-                  >
+                  <SidebarMenuButton asChild isActive={pathname === item.href}>
                     <a href={item.href}>
                       <item.icon className="h-4 w-4" />
                       <span>{item.title}</span>
@@ -83,6 +80,5 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }
-

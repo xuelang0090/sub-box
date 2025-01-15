@@ -1,9 +1,11 @@
-import "server-only"
-import { eq } from "drizzle-orm"
-import { type Subconverter, type SubconverterRow } from "@/types"
-import { subconverters } from "../db/schema"
-import db from "../db"
-import crypto from "crypto"
+import "server-only";
+
+import crypto from "crypto";
+import { eq } from "drizzle-orm";
+
+import { type Subconverter, type SubconverterRow } from "@/types";
+import db from "../db";
+import { subconverters } from "../db/schema";
 
 function rowToSubconverter(row: SubconverterRow): Subconverter {
   return {
@@ -18,12 +20,8 @@ class SubconverterService {
   }
 
   async get(id: string): Promise<Subconverter | null> {
-    const results = await db
-      .select()
-      .from(subconverters)
-      .where(eq(subconverters.id, id))
-      .limit(1);
-    
+    const results = await db.select().from(subconverters).where(eq(subconverters.id, id)).limit(1);
+
     return results[0] ? rowToSubconverter(results[0]) : null;
   }
 
@@ -50,11 +48,7 @@ class SubconverterService {
       updatedAt: now,
     };
 
-    const results = await db
-      .update(subconverters)
-      .set(updateData)
-      .where(eq(subconverters.id, id))
-      .returning();
+    const results = await db.update(subconverters).set(updateData).where(eq(subconverters.id, id)).returning();
 
     if (!results[0]) {
       throw new Error(`Subconverter with id ${id} not found`);
@@ -69,4 +63,3 @@ class SubconverterService {
 }
 
 export const subconverterService = new SubconverterService();
-

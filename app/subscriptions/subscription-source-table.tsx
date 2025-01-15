@@ -1,19 +1,13 @@
-"use client"
+"use client";
 
-import { useState, useTransition } from "react"
-import * as React from "react"
-import { Edit2, Trash2, ChevronRight, ChevronDown } from 'lucide-react'
-import { toast } from "sonner"
+import { useState, useTransition } from "react";
+import * as React from "react";
+import { ChevronDown, ChevronRight, Edit2, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+import { DateTime } from "@/components/date-time";
+import { IdBadge } from "@/components/id-badge";
+import { PopupSheet } from "@/components/popup-sheet";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,51 +17,47 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import { PopupSheet } from "@/components/popup-sheet"
-import { type SubscriptionSource, type User, type SubscriptionSourceItem } from "@/types"
-import { IdBadge } from "@/components/id-badge"
-import { DateTime } from "@/components/date-time"
-
-import { deleteSubscriptionSource } from "./actions"
-import { SubscriptionSourceForm } from "./subscription-source-form"
-import { SubscriptionSourceItemTable } from "./subscription-source-item-table"
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { type SubscriptionSource, type SubscriptionSourceItem, type User } from "@/types";
+import { deleteSubscriptionSource } from "./actions";
+import { SubscriptionSourceForm } from "./subscription-source-form";
+import { SubscriptionSourceItemTable } from "./subscription-source-item-table";
 
 interface SubscriptionSourceTableProps {
-  sources: (SubscriptionSource & { items: SubscriptionSourceItem[] })[]
-  users: User[]
+  sources: (SubscriptionSource & { items: SubscriptionSourceItem[] })[];
+  users: User[];
 }
 
 export function SubscriptionSourceTable({ sources, users }: SubscriptionSourceTableProps) {
-  const [editingItem, setEditingItem] = useState<SubscriptionSource | null>(null)
-  const [deletingItem, setDeletingItem] = useState<SubscriptionSource | null>(null)
-  const [expandedItems, setExpandedItems] = useState<Set<string>>(
-    new Set(sources.map(source => source.id))
-  )
-  const [isPending, startTransition] = useTransition()
+  const [editingItem, setEditingItem] = useState<SubscriptionSource | null>(null);
+  const [deletingItem, setDeletingItem] = useState<SubscriptionSource | null>(null);
+  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set(sources.map((source) => source.id)));
+  const [isPending, startTransition] = useTransition();
 
   function onDelete(item: SubscriptionSource) {
     startTransition(async () => {
       try {
-        await deleteSubscriptionSource(item.id)
-        toast("删除成功")
-        setDeletingItem(null)
+        await deleteSubscriptionSource(item.id);
+        toast("删除成功");
+        setDeletingItem(null);
       } catch (error) {
         toast("删除失败", {
           description: (error as Error).message,
-        })
+        });
       }
-    })
+    });
   }
 
   function toggleExpand(id: string) {
-    const newExpandedItems = new Set(expandedItems)
+    const newExpandedItems = new Set(expandedItems);
     if (newExpandedItems.has(id)) {
-      newExpandedItems.delete(id)
+      newExpandedItems.delete(id);
     } else {
-      newExpandedItems.add(id)
+      newExpandedItems.add(id);
     }
-    setExpandedItems(newExpandedItems)
+    setExpandedItems(newExpandedItems);
   }
 
   return (
@@ -99,46 +89,33 @@ export function SubscriptionSourceTable({ sources, users }: SubscriptionSourceTa
                 <TableRow>
                   <TableCell>
                     <div className="flex items-center">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6"
-                        onClick={() => toggleExpand(item.id)}
-                      >
-                        {expandedItems.has(item.id) ? (
-                          <ChevronDown className="h-4 w-4" />
-                        ) : (
-                          <ChevronRight className="h-4 w-4" />
-                        )}
+                      <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => toggleExpand(item.id)}>
+                        {expandedItems.has(item.id) ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
                         <span className="sr-only">展开</span>
                       </Button>
-                      <span className="text-sm text-muted-foreground">
-                        ({item.items.length})
-                      </span>
+                      <span className="text-sm text-muted-foreground">({item.items.length})</span>
                     </div>
                   </TableCell>
-                  <TableCell><IdBadge id={item.id} /></TableCell>
+                  <TableCell>
+                    <IdBadge id={item.id} />
+                  </TableCell>
                   <TableCell>{item.name}</TableCell>
                   <TableCell>{item.inboundProtocol}</TableCell>
                   <TableCell>{item.ip || "-"}</TableCell>
                   <TableCell>{item.url || "-"}</TableCell>
-                  <TableCell><DateTime date={item.createdAt} /></TableCell>
-                  <TableCell><DateTime date={item.updatedAt} /></TableCell>
+                  <TableCell>
+                    <DateTime date={item.createdAt} />
+                  </TableCell>
+                  <TableCell>
+                    <DateTime date={item.updatedAt} />
+                  </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setEditingItem(item)}
-                      >
+                      <Button variant="ghost" size="icon" onClick={() => setEditingItem(item)}>
                         <Edit2 className="h-4 w-4" />
                         <span className="sr-only">编辑</span>
                       </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setDeletingItem(item)}
-                      >
+                      <Button variant="ghost" size="icon" onClick={() => setDeletingItem(item)}>
                         <Trash2 className="h-4 w-4" />
                         <span className="sr-only">删除</span>
                       </Button>
@@ -148,12 +125,7 @@ export function SubscriptionSourceTable({ sources, users }: SubscriptionSourceTa
                 {expandedItems.has(item.id) && (
                   <TableRow>
                     <TableCell colSpan={6} className="p-0">
-                      <SubscriptionSourceItemTable
-                        sourceId={item.id}
-                        source={item}
-                        items={item.items}
-                        users={users}
-                      />
+                      <SubscriptionSourceItemTable sourceId={item.id} source={item} items={item.items} users={users} />
                     </TableCell>
                   </TableRow>
                 )}
@@ -163,34 +135,22 @@ export function SubscriptionSourceTable({ sources, users }: SubscriptionSourceTa
         </TableBody>
       </Table>
 
-      <PopupSheet
-        open={Boolean(editingItem)}
-        onOpenChange={(open) => !open && setEditingItem(null)}
-        title="编辑订阅源"
-      >
-        <SubscriptionSourceForm
-          source={editingItem ?? undefined}
-          onSuccess={() => setEditingItem(null)}
-        />
+      <PopupSheet open={Boolean(editingItem)} onOpenChange={(open) => !open && setEditingItem(null)} title="编辑订阅源">
+        <SubscriptionSourceForm source={editingItem ?? undefined} onSuccess={() => setEditingItem(null)} />
       </PopupSheet>
 
-      <AlertDialog
-        open={Boolean(deletingItem)}
-        onOpenChange={(open) => !open && setDeletingItem(null)}
-      >
+      <AlertDialog open={Boolean(deletingItem)} onOpenChange={(open) => !open && setDeletingItem(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>确认删除</AlertDialogTitle>
-            <AlertDialogDescription>
-              确定要删除订阅源 {deletingItem?.name} 吗？此操作不可撤销。
-            </AlertDialogDescription>
+            <AlertDialogDescription>确定要删除订阅源 {deletingItem?.name} 吗？此操作不可撤销。</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>取消</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
                 if (deletingItem) {
-                  onDelete(deletingItem)
+                  onDelete(deletingItem);
                 }
               }}
               disabled={isPending}
@@ -201,5 +161,5 @@ export function SubscriptionSourceTable({ sources, users }: SubscriptionSourceTa
         </AlertDialogContent>
       </AlertDialog>
     </>
-  )
-} 
+  );
+}

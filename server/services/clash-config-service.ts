@@ -1,9 +1,11 @@
 import "server-only";
-import { eq } from "drizzle-orm";
-import { type ClashConfig } from "@/types";
-import { clashConfigs } from "../db/schema";
-import db from "../db";
+
 import crypto from "crypto";
+import { eq } from "drizzle-orm";
+
+import { type ClashConfig } from "@/types";
+import db from "../db";
+import { clashConfigs } from "../db/schema";
 
 class ClashConfigService {
   async getAll(): Promise<ClashConfig[]> {
@@ -11,11 +13,7 @@ class ClashConfigService {
   }
 
   async get(id: string): Promise<ClashConfig | null> {
-    const results = await db
-      .select()
-      .from(clashConfigs)
-      .where(eq(clashConfigs.id, id))
-      .limit(1);
+    const results = await db.select().from(clashConfigs).where(eq(clashConfigs.id, id)).limit(1);
     return results[0] || null;
   }
 
@@ -30,7 +28,7 @@ class ClashConfigService {
 
     const results = await db.insert(clashConfigs).values(item).returning();
     if (!results[0]) {
-      throw new Error("Failed to create subscription source")
+      throw new Error("Failed to create subscription source");
     }
     return results[0];
   }
@@ -42,11 +40,7 @@ class ClashConfigService {
       updatedAt: now,
     };
 
-    const results = await db
-      .update(clashConfigs)
-      .set(updateData)
-      .where(eq(clashConfigs.id, id))
-      .returning();
+    const results = await db.update(clashConfigs).set(updateData).where(eq(clashConfigs.id, id)).returning();
 
     if (!results[0]) {
       throw new Error(`Config with id ${id} not found`);
@@ -61,4 +55,3 @@ class ClashConfigService {
 }
 
 export const clashConfigService = new ClashConfigService();
-

@@ -1,5 +1,5 @@
-import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
-import { relations } from 'drizzle-orm';
+import { relations } from "drizzle-orm";
+import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 // Notice for cursor AI:
 // after change the schema, you need to run the following commands:
@@ -7,14 +7,14 @@ import { relations } from 'drizzle-orm';
 // run `bun db:migrate` to migrate the schema
 
 // User table
-export const users = sqliteTable('users', {
-  id: text('id').primaryKey(),
-  name: text('name').notNull(),
-  subscriptionKey: text('subscription_key').notNull().unique(),
-  subconverterId: text('subconverter_id'),
-  mergeConfigId: text('merge_config_id'),
-  createdAt: text('created_at').notNull(),
-  updatedAt: text('updated_at').notNull(),
+export const users = sqliteTable("users", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  subscriptionKey: text("subscription_key").notNull().unique(),
+  subconverterId: text("subconverter_id"),
+  mergeConfigId: text("merge_config_id"),
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
 });
 
 // User relations
@@ -30,47 +30,47 @@ export const usersRelations = relations(users, ({ one }) => ({
 }));
 
 // Subconverter table
-export const subconverters = sqliteTable('subconverters', {
-  id: text('id').primaryKey(),
-  url: text('url').notNull(),
-  options: text('options').notNull(), // URL query string format
-  isDefault: integer('is_default', { mode: 'boolean' }).notNull().default(false),
-  createdAt: text('created_at').notNull(),
-  updatedAt: text('updated_at').notNull(),
+export const subconverters = sqliteTable("subconverters", {
+  id: text("id").primaryKey(),
+  url: text("url").notNull(),
+  options: text("options").notNull(), // URL query string format
+  isDefault: integer("is_default", { mode: "boolean" }).notNull().default(false),
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
 });
 
 // Clash Config table
-export const clashConfigs = sqliteTable('clash_configs', {
-  id: text('id').primaryKey(),
-  key: text('key').notNull().unique(),
-  name: text('name').notNull(),
-  globalConfig: text('global_config'), // YAML string
-  rules: text('rules'), // YAML string
-  createdAt: text('created_at').notNull(),
-  updatedAt: text('updated_at').notNull(),
+export const clashConfigs = sqliteTable("clash_configs", {
+  id: text("id").primaryKey(),
+  key: text("key").notNull().unique(),
+  name: text("name").notNull(),
+  globalConfig: text("global_config"), // YAML string
+  rules: text("rules"), // YAML string
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
 });
 
 // Subscription Source table
-export const subscriptionSources = sqliteTable('subscription_sources', {
-  id: text('id').primaryKey(),
-  name: text('name').notNull(),
-  inboundProtocol: text('inbound_protocol').notNull(),
-  ip: text('ip'),
-  url: text('url'),
-  createdAt: text('created_at').notNull(),
-  updatedAt: text('updated_at').notNull(),
+export const subscriptionSources = sqliteTable("subscription_sources", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  inboundProtocol: text("inbound_protocol").notNull(),
+  ip: text("ip"),
+  url: text("url"),
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
 });
 
 // Subscription Source Item table
-export const subscriptionSourceItems = sqliteTable('subscription_source_items', {
-  id: text('id').primaryKey(),
-  subscriptionSourceId: text('subscription_source_id').notNull(),
-  userId: text('user_id').notNull(),
-  enable: integer('enable', { mode: 'boolean' }).notNull(),
-  url: text('url').notNull(),
-  upToDate: integer('up_to_date', { mode: 'boolean' }).notNull(),
-  createdAt: text('created_at').notNull(),
-  updatedAt: text('updated_at').notNull(),
+export const subscriptionSourceItems = sqliteTable("subscription_source_items", {
+  id: text("id").primaryKey(),
+  subscriptionSourceId: text("subscription_source_id").notNull(),
+  userId: text("user_id").notNull(),
+  enable: integer("enable", { mode: "boolean" }).notNull(),
+  url: text("url").notNull(),
+  upToDate: integer("up_to_date", { mode: "boolean" }).notNull(),
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
 });
 
 // Subscription Source Item relations
@@ -83,4 +83,4 @@ export const subscriptionSourceItemsRelations = relations(subscriptionSourceItem
     fields: [subscriptionSourceItems.userId],
     references: [users.id],
   }),
-})); 
+}));

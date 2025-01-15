@@ -1,18 +1,13 @@
-"use client"
+"use client";
 
-import { useState, useTransition, useEffect } from "react"
-import { Edit2, Trash2, ChevronRight, ChevronDown } from 'lucide-react'
-import { toast } from "sonner"
+import { useEffect, useState, useTransition } from "react";
+import { ChevronDown, ChevronRight, Edit2, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+import { CollapseDisplay } from "@/components/collapse-display";
+import { DateTime } from "@/components/date-time";
+import { IdBadge } from "@/components/id-badge";
+import { PopupSheet } from "@/components/popup-sheet";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,69 +17,69 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import { PopupSheet } from "@/components/popup-sheet"
-import { type User, type SubscriptionSourceItem, type SubscriptionSource } from "@/types"
-import { IdBadge } from "@/components/id-badge"
-import { DateTime } from "@/components/date-time"
-import { CollapseDisplay } from "@/components/collapse-display"
-
-import { deleteUser } from "./actions"
-import { UserForm } from "./user-form"
-import { UserSubscriptionItemTable } from "./user-subscription-item-table"
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { type SubscriptionSource, type SubscriptionSourceItem, type User } from "@/types";
+import { deleteUser } from "./actions";
+import { UserForm } from "./user-form";
+import { UserSubscriptionItemTable } from "./user-subscription-item-table";
 
 interface UserTableProps {
-  users: User[]
-  items: SubscriptionSourceItem[]
-  sources: SubscriptionSource[]
+  users: User[];
+  items: SubscriptionSourceItem[];
+  sources: SubscriptionSource[];
 }
 
 export function UserTable({ users, items, sources }: UserTableProps) {
-  const [editingUser, setEditingUser] = useState<User | null>(null)
-  const [deletingUser, setDeletingUser] = useState<User | null>(null)
-  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set())
-  const [baseUrl, setBaseUrl] = useState("")
-  const [isPending, startTransition] = useTransition()
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [deletingUser, setDeletingUser] = useState<User | null>(null);
+  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
+  const [baseUrl, setBaseUrl] = useState("");
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
-    setBaseUrl(window.location.origin)
-  }, [])
+    setBaseUrl(window.location.origin);
+  }, []);
 
   function onDelete(user: User) {
     startTransition(async () => {
       try {
-        await deleteUser(user.id)
-        toast("删除成功")
-        setDeletingUser(null)
+        await deleteUser(user.id);
+        toast("删除成功");
+        setDeletingUser(null);
       } catch (error) {
-        toast.error((error as Error).message)
+        toast.error((error as Error).message);
       }
-    })
+    });
   }
 
   function toggleExpand(id: string) {
-    const newExpandedItems = new Set(expandedItems)
+    const newExpandedItems = new Set(expandedItems);
     if (newExpandedItems.has(id)) {
-      newExpandedItems.delete(id)
+      newExpandedItems.delete(id);
     } else {
-      newExpandedItems.add(id)
+      newExpandedItems.add(id);
     }
-    setExpandedItems(newExpandedItems)
+    setExpandedItems(newExpandedItems);
   }
 
   function getSubscriptionUrl(subscriptionKey: string) {
-    return baseUrl ? `${baseUrl}/sub/${subscriptionKey}` : ""
+    return baseUrl ? `${baseUrl}/sub/${subscriptionKey}` : "";
   }
 
   // Group items by user id
-  const itemsByUser = items.reduce((acc, item) => {
-    const userId = item.userId
-    if (!acc[userId]) {
-      acc[userId] = []
-    }
-    acc[userId].push(item)
-    return acc
-  }, {} as Record<string, SubscriptionSourceItem[]>)
+  const itemsByUser = items.reduce(
+    (acc, item) => {
+      const userId = item.userId;
+      if (!acc[userId]) {
+        acc[userId] = [];
+      }
+      acc[userId].push(item);
+      return acc;
+    },
+    {} as Record<string, SubscriptionSourceItem[]>
+  );
 
   return (
     <>
@@ -115,50 +110,33 @@ export function UserTable({ users, items, sources }: UserTableProps) {
                 <TableRow key={user.id}>
                   <TableCell>
                     <div className="flex items-center">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6"
-                        onClick={() => toggleExpand(user.id)}
-                      >
-                        {expandedItems.has(user.id) ? (
-                          <ChevronDown className="h-4 w-4" />
-                        ) : (
-                          <ChevronRight className="h-4 w-4" />
-                        )}
+                      <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => toggleExpand(user.id)}>
+                        {expandedItems.has(user.id) ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
                         <span className="sr-only">展开</span>
                       </Button>
-                      <span className="text-sm text-muted-foreground">
-                        ({itemsByUser[user.id]?.length || 0})
-                      </span>
+                      <span className="text-sm text-muted-foreground">({itemsByUser[user.id]?.length || 0})</span>
                     </div>
                   </TableCell>
-                  <TableCell><IdBadge id={user.id} /></TableCell>
-                  <TableCell>{user.name}</TableCell>
                   <TableCell>
-                    {baseUrl && (
-                      <CollapseDisplay url={getSubscriptionUrl(user.subscriptionKey)} />
-                    )}
+                    <IdBadge id={user.id} />
                   </TableCell>
+                  <TableCell>{user.name}</TableCell>
+                  <TableCell>{baseUrl && <CollapseDisplay url={getSubscriptionUrl(user.subscriptionKey)} />}</TableCell>
                   <TableCell>{user.subconverterId ? <IdBadge id={user.subconverterId} /> : "-"}</TableCell>
                   <TableCell>{user.mergeConfigId ? <IdBadge id={user.mergeConfigId} /> : "-"}</TableCell>
-                  <TableCell><DateTime date={user.createdAt} /></TableCell>
-                  <TableCell><DateTime date={user.updatedAt} /></TableCell>
+                  <TableCell>
+                    <DateTime date={user.createdAt} />
+                  </TableCell>
+                  <TableCell>
+                    <DateTime date={user.updatedAt} />
+                  </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setEditingUser(user)}
-                      >
+                      <Button variant="ghost" size="icon" onClick={() => setEditingUser(user)}>
                         <Edit2 className="h-4 w-4" />
                         <span className="sr-only">编辑</span>
                       </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setDeletingUser(user)}
-                      >
+                      <Button variant="ghost" size="icon" onClick={() => setDeletingUser(user)}>
                         <Trash2 className="h-4 w-4" />
                         <span className="sr-only">删除</span>
                       </Button>
@@ -168,11 +146,7 @@ export function UserTable({ users, items, sources }: UserTableProps) {
                 {expandedItems.has(user.id) && (
                   <TableRow>
                     <TableCell colSpan={8} className="p-0 pl-20">
-                      <UserSubscriptionItemTable
-                        userId={user.id}
-                        items={itemsByUser[user.id] || []}
-                        sources={sources}
-                      />
+                      <UserSubscriptionItemTable userId={user.id} items={itemsByUser[user.id] || []} sources={sources} />
                     </TableCell>
                   </TableRow>
                 )}
@@ -182,34 +156,22 @@ export function UserTable({ users, items, sources }: UserTableProps) {
         </TableBody>
       </Table>
 
-      <PopupSheet
-        open={Boolean(editingUser)}
-        onOpenChange={(open) => !open && setEditingUser(null)}
-        title="编辑用户"
-      >
-        <UserForm
-          user={editingUser ?? undefined}
-          onSuccess={() => setEditingUser(null)}
-        />
+      <PopupSheet open={Boolean(editingUser)} onOpenChange={(open) => !open && setEditingUser(null)} title="编辑用户">
+        <UserForm user={editingUser ?? undefined} onSuccess={() => setEditingUser(null)} />
       </PopupSheet>
 
-      <AlertDialog
-        open={Boolean(deletingUser)}
-        onOpenChange={(open) => !open && setDeletingUser(null)}
-      >
+      <AlertDialog open={Boolean(deletingUser)} onOpenChange={(open) => !open && setDeletingUser(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>确认删除</AlertDialogTitle>
-            <AlertDialogDescription>
-              确定要删除用户 {deletingUser?.name} 吗？此操作不可撤销。
-            </AlertDialogDescription>
+            <AlertDialogDescription>确定要删除用户 {deletingUser?.name} 吗？此操作不可撤销。</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>取消</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
                 if (deletingUser) {
-                  onDelete(deletingUser)
+                  onDelete(deletingUser);
                 }
               }}
               disabled={isPending}
@@ -220,6 +182,5 @@ export function UserTable({ users, items, sources }: UserTableProps) {
         </AlertDialogContent>
       </AlertDialog>
     </>
-  )
+  );
 }
-

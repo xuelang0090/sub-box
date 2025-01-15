@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { PlusCircle } from 'lucide-react'
+import { useState } from "react";
+import { PlusCircle } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { PopupSheet } from "@/components/popup-sheet"
-import { ClashConfigForm } from "./clash-config-form"
+import { PopupSheet } from "@/components/popup-sheet";
+import { Button } from "@/components/ui/button";
+import { ClashConfigForm } from "./clash-config-form";
 
 export function CreateClashConfigDialog() {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
 
   return (
     <>
@@ -17,13 +17,9 @@ export function CreateClashConfigDialog() {
         添加配置
       </Button>
 
-      <PopupSheet
-        open={open}
-        onOpenChange={setOpen}
-        title="添加 Clash 配置"
-      >
+      <PopupSheet open={open} onOpenChange={setOpen} title="添加 Clash 配置">
         <ClashConfigForm onSuccess={() => setOpen(false)} />
       </PopupSheet>
     </>
-  )
-} 
+  );
+}

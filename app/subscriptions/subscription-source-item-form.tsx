@@ -1,32 +1,18 @@
-"use client"
+"use client";
 
-import { useTransition } from "react"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
-import { toast } from "sonner"
+import { useTransition } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import * as z from "zod";
 
-import { Button } from "@/components/ui/button"
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import { Textarea } from "@/components/ui/textarea"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
-import { type SubscriptionSourceItem, type User, type SubscriptionSource } from "@/types"
-
-import { createSubscriptionSourceItem, updateSubscriptionSourceItem } from "./actions"
+import { Button } from "@/components/ui/button";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
+import { type SubscriptionSource, type SubscriptionSourceItem, type User } from "@/types";
+import { createSubscriptionSourceItem, updateSubscriptionSourceItem } from "./actions";
 
 const formSchema = z.object({
   userId: z.string().min(1, "用户不能为空"),
@@ -34,20 +20,20 @@ const formSchema = z.object({
   url: z.string().min(1, "URL不能为空"), // 不需要检查 url 是否是有效，因为可能有 vless:// 等格式
   enable: z.boolean(),
   upToDate: z.boolean(),
-})
+});
 
-type FormData = z.infer<typeof formSchema>
+type FormData = z.infer<typeof formSchema>;
 
 interface SubscriptionSourceItemFormProps {
-  userId?: string
-  sources: SubscriptionSource[]
-  users?: User[]
-  item?: SubscriptionSourceItem
-  onSuccess?: () => void
+  userId?: string;
+  sources: SubscriptionSource[];
+  users?: User[];
+  item?: SubscriptionSourceItem;
+  onSuccess?: () => void;
 }
 
 export function SubscriptionSourceItemForm({ userId, sources, users, item, onSuccess }: SubscriptionSourceItemFormProps) {
-  const [isPending, startTransition] = useTransition()
+  const [isPending, startTransition] = useTransition();
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -58,48 +44,48 @@ export function SubscriptionSourceItemForm({ userId, sources, users, item, onSuc
       enable: item?.enable ?? true,
       upToDate: item?.upToDate ?? true,
     },
-  })
+  });
 
-  const selectedSource = sources.find(s => s.id === form.watch("subscriptionSourceId"))
+  const selectedSource = sources.find((s) => s.id === form.watch("subscriptionSourceId"));
 
   const replaceIpInUrl = () => {
-    const currentUrl = form.getValues("url")
+    const currentUrl = form.getValues("url");
     if (!currentUrl) {
-      toast("URL不能为空")
-      return
+      toast("URL不能为空");
+      return;
     }
     if (!selectedSource?.ip) {
-      toast("订阅源IP不能为空")
-      return
+      toast("订阅源IP不能为空");
+      return;
     }
 
-    const match = currentUrl.match(/@([^:]+):/)
+    const match = currentUrl.match(/@([^:]+):/);
     if (!match) {
-      toast("URL格式不正确，未找到可替换的IP")
-      return
+      toast("URL格式不正确，未找到可替换的IP");
+      return;
     }
 
-    const newUrl = currentUrl.replace(/@([^:]+):/, `@${selectedSource.ip}:`)
-    form.setValue("url", newUrl)
-    toast("IP已替换")
-  }
+    const newUrl = currentUrl.replace(/@([^:]+):/, `@${selectedSource.ip}:`);
+    form.setValue("url", newUrl);
+    toast("IP已替换");
+  };
 
   function onSubmit(data: FormData) {
     startTransition(async () => {
       try {
         if (item) {
-          await updateSubscriptionSourceItem(item.id, data)
+          await updateSubscriptionSourceItem(item.id, data);
         } else {
-          await createSubscriptionSourceItem(data)
+          await createSubscriptionSourceItem(data);
         }
 
-        toast("保存成功")
-        
-        onSuccess?.()
+        toast("保存成功");
+
+        onSuccess?.();
       } catch (error) {
-        toast.error((error as Error).message)
+        toast.error((error as Error).message);
       }
-    })
+    });
   }
 
   return (
@@ -162,22 +148,12 @@ export function SubscriptionSourceItemForm({ userId, sources, users, item, onSuc
             <FormItem>
               <div className="flex items-center justify-between">
                 <FormLabel>URL</FormLabel>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="h-6 text-xs"
-                  onClick={replaceIpInUrl}
-                >
+                <Button type="button" variant="ghost" size="sm" className="h-6 text-xs" onClick={replaceIpInUrl}>
                   覆盖IP
                 </Button>
               </div>
               <FormControl>
-                <Textarea
-                  {...field}
-                  rows={6}
-                  className="font-mono text-sm"
-                />
+                <Textarea {...field} rows={6} className="font-mono text-sm" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -189,15 +165,10 @@ export function SubscriptionSourceItemForm({ userId, sources, users, item, onSuc
           render={({ field }) => (
             <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
               <div className="space-y-0.5">
-                <FormLabel className="text-base">
-                  启用
-                </FormLabel>
+                <FormLabel className="text-base">启用</FormLabel>
               </div>
               <FormControl>
-                <Switch
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
+                <Switch checked={field.value} onCheckedChange={field.onChange} />
               </FormControl>
             </FormItem>
           )}
@@ -208,15 +179,10 @@ export function SubscriptionSourceItemForm({ userId, sources, users, item, onSuc
           render={({ field }) => (
             <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
               <div className="space-y-0.5">
-                <FormLabel className="text-base">
-                  设为最新
-                </FormLabel>
+                <FormLabel className="text-base">设为最新</FormLabel>
               </div>
               <FormControl>
-                <Switch
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
+                <Switch checked={field.value} onCheckedChange={field.onChange} />
               </FormControl>
             </FormItem>
           )}
@@ -226,5 +192,5 @@ export function SubscriptionSourceItemForm({ userId, sources, users, item, onSuc
         </Button>
       </form>
     </Form>
-  )
-} 
+  );
+}

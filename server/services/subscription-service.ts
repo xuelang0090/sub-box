@@ -1,19 +1,17 @@
 import "server-only";
+
 import { eq } from "drizzle-orm";
-import { users, subscriptionSourceItems } from "../db/schema";
+
 import db from "../db";
-import { userService } from "./user-service";
+import { subscriptionSourceItems, users } from "../db/schema";
 import { subconverterService } from "./subconverter-service";
 import { subscriptionSourceItemService } from "./subscription-source-item-service";
+import { userService } from "./user-service";
 
 class SubscriptionService {
   async generateSubscription(subscriptionKey: string): Promise<string> {
     // Find user by subscription key
-    const userResults = await db
-      .select()
-      .from(users)
-      .where(eq(users.subscriptionKey, subscriptionKey))
-      .limit(1);
+    const userResults = await db.select().from(users).where(eq(users.subscriptionKey, subscriptionKey)).limit(1);
 
     const user = userResults[0];
     if (!user) {
@@ -21,10 +19,7 @@ class SubscriptionService {
     }
 
     // Get all enabled subscription source items for the user
-    const sourceItems = await db
-      .select()
-      .from(subscriptionSourceItems)
-      .where(eq(subscriptionSourceItems.userId, user.id));
+    const sourceItems = await db.select().from(subscriptionSourceItems).where(eq(subscriptionSourceItems.userId, user.id));
 
     const enabledItems = sourceItems.filter((item) => item.enable);
     if (enabledItems.length === 0) {
@@ -47,15 +42,11 @@ class SubscriptionService {
     }
 
     // Construct URLs
-    const urls = enabledItems
-      .map((item) => encodeURIComponent(item.url))
-      .join("|");
+    const urls = enabledItems.map((item) => encodeURIComponent(item.url)).join("|");
     const baseUrl = `${subconverter.url}/sub?target=clash&url=${urls}`;
 
     // Add options if any
-    const finalUrl = subconverter.options
-      ? `${baseUrl}&${subconverter.options}`
-      : baseUrl;
+    const finalUrl = subconverter.options ? `${baseUrl}&${subconverter.options}` : baseUrl;
 
     // Fetch the subscription
     try {

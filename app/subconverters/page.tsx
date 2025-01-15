@@ -1,10 +1,10 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { getSubconverters } from "./actions"
-import { SubconverterTable } from "./subconverter-table"
-import { CreateSubconverterDialog } from "./create-subconverter-dialog"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getSubconverters } from "./actions";
+import { CreateSubconverterDialog } from "./create-subconverter-dialog";
+import { SubconverterTable } from "./subconverter-table";
 
 export default async function SubconvertersPage() {
-  const subconverters = await getSubconverters()
+  const subconverters = await getSubconverters();
 
   return (
     <Card>
@@ -16,6 +16,5 @@ export default async function SubconvertersPage() {
         <SubconverterTable subconverters={subconverters} />
       </CardContent>
     </Card>
-  )
+  );
 }
-
