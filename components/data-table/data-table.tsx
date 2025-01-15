@@ -1,0 +1,183 @@
+"use client";
+
+import { useState } from "react";
+import {
+  ColumnDef,
+  SortingState,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getSortedRowModel,
+  useReactTable,
+  type VisibilityState,
+} from "@tanstack/react-table";
+import { ChevronDown, ChevronRight, Search } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { DataTableViewOptions } from "./data-table-view-options";
+import { cn } from "@/lib/utils";
+
+interface DataTableProps<TData extends { id: string }> {
+  columns: ColumnDef<TData, unknown>[];
+  data: TData[];
+  expandedContent?: (item: TData) => React.ReactNode;
+  defaultExpanded?: boolean;
+  enableColumnVisibility?: boolean;
+  enableGlobalSearch?: boolean;
+  className?: string;
+  getItemCount?: (item: TData) => number;
+}
+
+export function DataTable<TData extends { id: string }>({
+  columns,
+  data,
+  expandedContent,
+  defaultExpanded = false,
+  enableColumnVisibility = false,
+  enableGlobalSearch = false,
+  className,
+  getItemCount,
+}: DataTableProps<TData>) {
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(() => (defaultExpanded ? new Set(data.map((item) => item.id)) : new Set()));
+  const [globalFilter, setGlobalFilter] = useState("");
+
+  const table = useReactTable({
+    data,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    onSortingChange: setSorting,
+    getSortedRowModel: getSortedRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    getFilteredRowModel: getFilteredRowModel(),
+    onGlobalFilterChange: setGlobalFilter,
+    state: {
+      sorting,
+      columnVisibility,
+      globalFilter,
+    },
+    enableHiding: enableColumnVisibility,
+  });
+
+  const toggleExpand = (id: string) => {
+    const newExpandedRows = new Set(expandedRows);
+    if (newExpandedRows.has(id)) {
+      newExpandedRows.delete(id);
+    } else {
+      newExpandedRows.add(id);
+    }
+    setExpandedRows(newExpandedRows);
+  };
+
+  const hasToolbar = enableGlobalSearch || enableColumnVisibility;
+
+  return (
+    <div className={cn("space-y-4", !hasToolbar && "space-y-0", className)}>
+      {hasToolbar && (
+        <div className="flex items-center justify-between">
+          <div className="flex flex-1 items-center space-x-2">
+            {enableGlobalSearch && (
+              <div className="flex items-center space-x-2">
+                <Search className="h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="搜索..."
+                  value={globalFilter}
+                  onChange={(e) => setGlobalFilter(e.target.value)}
+                  className="h-8 w-[150px] lg:w-[250px]"
+                />
+              </div>
+            )}
+          </div>
+          {enableColumnVisibility && <DataTableViewOptions table={table} />}
+        </div>
+      )}
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {expandedContent && <TableHead className="w-[50px]" />}
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                  </TableHead>
+                ))}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => [
+                <TableRow 
+                  key={row.id} 
+                  data-state={row.getIsSelected() && "selected"}
+                  className={cn(
+                    expandedContent && "cursor-pointer hover:bg-muted/50",
+                    expandedRows.has(row.original.id) && "bg-muted/50"
+                  )}
+                  onClick={() => expandedContent && toggleExpand(row.original.id)}
+                >
+                  {expandedContent && (
+                    <TableCell onClick={(e) => e.stopPropagation()}>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleExpand(row.original.id);
+                          }}
+                        >
+                          {expandedRows.has(row.original.id) ? (
+                            <ChevronDown className="h-4 w-4" />
+                          ) : (
+                            <ChevronRight className="h-4 w-4" />
+                          )}
+                          <span className="sr-only">展开</span>
+                        </Button>
+                        {getItemCount && (
+                          <span className="text-sm text-muted-foreground">
+                            {getItemCount(row.original)}
+                          </span>
+                        )}
+                      </div>
+                    </TableCell>
+                  )}
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell 
+                      key={cell.id}
+                      onClick={(e) => {
+                        if (cell.column.id === "actions") {
+                          e.stopPropagation();
+                        }
+                      }}
+                    >
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  ))}
+                </TableRow>,
+                expandedContent && expandedRows.has(row.original.id) && (
+                  <TableRow key={`${row.id}-expanded`}>
+                    <TableCell colSpan={columns.length + 1} className="p-0 pl-20 pr-2">
+                      {expandedContent(row.original)}
+                    </TableCell>
+                  </TableRow>
+                ),
+              ])
+            ) : (
+              <TableRow>
+                <TableCell colSpan={columns.length + (expandedContent ? 1 : 0)} className="h-24 text-center">
+                  暂无数据
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
+  );
+} 

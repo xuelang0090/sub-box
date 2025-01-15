@@ -1,12 +1,10 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Edit2, PlusCircle, Trash2 } from "lucide-react";
+import { PlusCircle } from "lucide-react";
 import { toast } from "sonner";
 
-import { CollapseDisplay } from "@/components/collapse-display";
-import { DateTime } from "@/components/date-time";
-import { IdBadge } from "@/components/id-badge";
+import { DataTable } from "@/components/data-table/data-table";
 import { PopupSheet } from "@/components/popup-sheet";
 import {
   AlertDialog,
@@ -19,11 +17,10 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { type Node, type NodeClient } from "@/types";
 import { deleteNodeClient } from "../nodes/actions";
 import { NodeClientForm } from "../nodes/node-client-form";
+import { createColumns } from "./user-node-client-columns";
 
 interface UserNodeClientTableProps {
   userId: string;
@@ -51,70 +48,26 @@ export function UserNodeClientTable({ userId, items, nodes }: UserNodeClientTabl
     });
   }
 
+  const columns = createColumns({
+    nodes,
+    onEdit: setEditingItem,
+    onDelete: setDeletingItem,
+  });
+
   return (
     <>
-      <div className="mt-4">
-        <div className="flex mb-4">
+      <div className="py-2">
+        <div className="flex mb-2">
           <Button variant="outline" size="sm" onClick={() => setIsCreating(true)}>
             <PlusCircle className="mr-2 h-4 w-4" />
             添加客户端
           </Button>
         </div>
 
-        <Card className="bg-muted/30">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>ID</TableHead>
-                <TableHead>节点</TableHead>
-                <TableHead>URL</TableHead>
-                <TableHead>状态</TableHead>
-                <TableHead>更新时间</TableHead>
-                <TableHead className="w-[100px]">操作</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {items.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="h-24 text-center">
-                    暂无数据
-                  </TableCell>
-                </TableRow>
-              ) : (
-                items.map((item) => {
-                  const node = nodes.find((n) => n.id === item.nodeId);
-                  return (
-                    <TableRow key={item.id}>
-                      <TableCell>
-                        <IdBadge id={item.id} />
-                      </TableCell>
-                      <TableCell>{node?.name || "-"}</TableCell>
-                      <TableCell>
-                        <CollapseDisplay url={item.url} />
-                      </TableCell>
-                      <TableCell>{item.enable ? "启用" : "禁用"}</TableCell>
-                      <TableCell>
-                        <DateTime date={item.updatedAt} />
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Button variant="ghost" size="icon" onClick={() => setEditingItem(item)}>
-                            <Edit2 className="h-4 w-4" />
-                            <span className="sr-only">编辑</span>
-                          </Button>
-                          <Button variant="ghost" size="icon" onClick={() => setDeletingItem(item)}>
-                            <Trash2 className="h-4 w-4" />
-                            <span className="sr-only">删除</span>
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })
-              )}
-            </TableBody>
-          </Table>
-        </Card>
+        <DataTable 
+          columns={columns} 
+          data={items} 
+        />
       </div>
 
       <PopupSheet

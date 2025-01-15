@@ -7,10 +7,8 @@ import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
-type Theme = "light" | "dark" | "system";
-
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { theme: _, setTheme } = useTheme();
 
   return (
     <DropdownMenu>

@@ -1,11 +1,9 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Edit2, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
-import { DateTime } from "@/components/date-time";
-import { IdBadge } from "@/components/id-badge";
+import { DataTable } from "@/components/data-table/data-table";
 import { PopupSheet } from "@/components/popup-sheet";
 import {
   AlertDialog,
@@ -17,10 +15,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { type ClashConfig } from "@/types";
 import { deleteClashConfig } from "./actions";
+import { createColumns } from "./columns";
 import { ClashConfigForm } from "./clash-config-form";
 
 interface ClashConfigTableProps {
@@ -44,55 +41,14 @@ export function ClashConfigTable({ configs }: ClashConfigTableProps) {
     });
   }
 
+  const columns = createColumns({
+    onEdit: setEditingItem,
+    onDelete: setDeletingItem,
+  });
+
   return (
     <>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>ID</TableHead>
-            <TableHead>名称</TableHead>
-            <TableHead>创建时间</TableHead>
-            <TableHead>更新时间</TableHead>
-            <TableHead className="w-[100px]">操作</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {configs.length === 0 ? (
-            <TableRow>
-              <TableCell colSpan={5} className="h-24 text-center">
-                暂无数据
-              </TableCell>
-            </TableRow>
-          ) : (
-            configs.map((item) => (
-              <TableRow key={item.id}>
-                <TableCell>
-                  <IdBadge id={item.id} />
-                </TableCell>
-                <TableCell>{item.name}</TableCell>
-                <TableCell>
-                  <DateTime date={item.createdAt} />
-                </TableCell>
-                <TableCell>
-                  <DateTime date={item.updatedAt} />
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="icon" onClick={() => setEditingItem(item)}>
-                      <Edit2 className="h-4 w-4" />
-                      <span className="sr-only">编辑</span>
-                    </Button>
-                    <Button variant="ghost" size="icon" onClick={() => setDeletingItem(item)}>
-                      <Trash2 className="h-4 w-4" />
-                      <span className="sr-only">删除</span>
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
+      <DataTable columns={columns} data={configs} />
 
       <PopupSheet open={Boolean(editingItem)} onOpenChange={(open) => !open && setEditingItem(null)} title="编辑 Clash 配置">
         <ClashConfigForm config={editingItem ?? undefined} onSuccess={() => setEditingItem(null)} />

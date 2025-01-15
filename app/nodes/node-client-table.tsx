@@ -1,13 +1,10 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import * as React from "react";
-import { Edit2, PlusCircle, Trash2 } from "lucide-react";
+import { PlusCircle } from "lucide-react";
 import { toast } from "sonner";
 
-import { CollapseDisplay } from "@/components/collapse-display";
-import { DateTime } from "@/components/date-time";
-import { IdBadge } from "@/components/id-badge";
+import { DataTable } from "@/components/data-table/data-table";
 import { PopupSheet } from "@/components/popup-sheet";
 import {
   AlertDialog,
@@ -19,22 +16,22 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { type Node, type NodeClient, type User } from "@/types";
 import { deleteNodeClient } from "./actions";
+import { createColumns } from "./node-client-columns";
 import { NodeClientForm } from "./node-client-form";
 
 interface NodeClientTableProps {
+  userId?: string;
+  nodeId?: string;
+  node?: Node;
   items: NodeClient[];
-  nodeId: string;
-  node: Node;
+  nodes: Node[];
   users: User[];
 }
 
-export function NodeClientTable({ items, nodeId: _, node, users }: NodeClientTableProps) {
+export function NodeClientTable({ userId, nodeId: _, node, items, nodes, users }: NodeClientTableProps) {
   const [editingItem, setEditingItem] = useState<NodeClient | null>(null);
   const [deletingItem, setDeletingItem] = useState<NodeClient | null>(null);
   const [isCreating, setIsCreating] = useState(false);
@@ -54,67 +51,27 @@ export function NodeClientTable({ items, nodeId: _, node, users }: NodeClientTab
     });
   }
 
+  const columns = createColumns({
+    nodes,
+    users,
+    onEdit: setEditingItem,
+    onDelete: setDeletingItem,
+  });
+
   return (
     <>
-      <div className="mt-4">
-        <div className="flex mb-4">
+      <div className="py-2">
+        <div className="flex mb-2">
           <Button variant="outline" size="sm" onClick={() => setIsCreating(true)}>
             <PlusCircle className="mr-2 h-4 w-4" />
             添加客户端
           </Button>
         </div>
 
-        <Card className="bg-muted/30">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>ID</TableHead>
-                <TableHead>用户</TableHead>
-                <TableHead>URL</TableHead>
-                <TableHead>状态</TableHead>
-                <TableHead>更新时间</TableHead>
-                <TableHead className="w-[100px]">操作</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {items.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="h-24 text-center">
-                    暂无数据
-                  </TableCell>
-                </TableRow>
-              ) : (
-                items.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell>
-                      <IdBadge id={item.id} />
-                    </TableCell>
-                    <TableCell>{users.find((u) => u.id === item.userId)?.name || "-"}</TableCell>
-                    <TableCell>
-                      <CollapseDisplay url={item.url} />
-                    </TableCell>
-                    <TableCell>{item.enable ? "启用" : "禁用"}</TableCell>
-                    <TableCell>
-                      <DateTime date={item.updatedAt} />
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="icon" onClick={() => setEditingItem(item)}>
-                          <Edit2 className="h-4 w-4" />
-                          <span className="sr-only">编辑</span>
-                        </Button>
-                        <Button variant="ghost" size="icon" onClick={() => setDeletingItem(item)}>
-                          <Trash2 className="h-4 w-4" />
-                          <span className="sr-only">删除</span>
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </Card>
+        <DataTable 
+          columns={columns} 
+          data={items} 
+        />
       </div>
 
       <PopupSheet
@@ -128,8 +85,8 @@ export function NodeClientTable({ items, nodeId: _, node, users }: NodeClientTab
         title={editingItem ? "编辑客户端" : "添加客户端"}
       >
         <NodeClientForm
-          nodes={[node]}
-          users={users}
+          userId={userId}
+          nodes={node ? [node] : nodes}
           item={editingItem ?? undefined}
           onSuccess={() => {
             setEditingItem(null);
