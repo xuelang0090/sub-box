@@ -15,7 +15,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { type Node, type NodeClient, type User } from "@/types";
+import { type Node, type NodeClient, type User, type ClashConfig } from "@/types";
 import { deleteUser } from "./actions";
 import { createColumns } from "./columns";
 import { UserForm } from "./user-form";
@@ -25,9 +25,10 @@ interface UserTableProps {
   users: User[];
   items: NodeClient[];
   nodes: Node[];
+  clashConfigs: ClashConfig[];
 }
 
-export function UserTable({ users, items, nodes }: UserTableProps) {
+export function UserTable({ users, items, nodes, clashConfigs }: UserTableProps) {
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [deletingUser, setDeletingUser] = useState<User | null>(null);
   const [baseUrl, setBaseUrl] = useState("");
@@ -66,6 +67,7 @@ export function UserTable({ users, items, nodes }: UserTableProps) {
     baseUrl,
     onEdit: setEditingUser,
     onDelete: setDeletingUser,
+    clashConfigs,
   });
 
   return (
@@ -76,6 +78,10 @@ export function UserTable({ users, items, nodes }: UserTableProps) {
         expandedContent={(user) => (
           <UserNodeClientTable userId={user.id} items={itemsByUser[user.id] || []} nodes={nodes} />
         )}
+        expandedTitle={(user) => {
+          const count = itemsByUser[user.id]?.length || 0;
+          return `用户 ${user.name} 的客户端列表 (${count})`;
+        }}
         enableColumnVisibility
         enableGlobalSearch
         getItemCount={(user) => itemsByUser[user.id]?.length || 0}

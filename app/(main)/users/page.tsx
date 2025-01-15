@@ -2,12 +2,12 @@ import { Suspense } from "react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getNodes } from "../nodes/actions";
-import { getUsers } from "./actions";
+import { getClashConfigs, getUsers } from "./actions";
 import { CreateUserDialog } from "./create-user-dialog";
 import { UserTable } from "./user-table";
 
 export default async function UsersPage() {
-  const [users, nodes] = await Promise.all([getUsers(), getNodes()]);
+  const [users, nodes, clashConfigs] = await Promise.all([getUsers(), getNodes(), getClashConfigs()]);
 
   return (
     <Card>
@@ -19,7 +19,7 @@ export default async function UsersPage() {
       </CardHeader>
       <CardContent>
         <Suspense fallback={<div>加载中...</div>}>
-          <UserTable users={users} items={nodes.flatMap((node) => node.items)} nodes={nodes} />
+          <UserTable users={users} items={nodes.flatMap((node) => node.items)} nodes={nodes} clashConfigs={clashConfigs} />
         </Suspense>
       </CardContent>
     </Card>

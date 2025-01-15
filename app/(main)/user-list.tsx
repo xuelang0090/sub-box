@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { CollapseDisplay } from "@/components/collapse-display"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { type User } from "@/types"
+import { type User, type ClashConfig } from "@/types"
 import { Badge } from "@/components/ui/badge"
 import { Link2, Settings, FileJson } from "lucide-react"
 import { IdBadge } from "@/components/id-badge"
@@ -12,9 +12,10 @@ import { DateTime } from "@/components/date-time"
 
 interface UserListProps {
   users: User[]
+  clashConfigs: ClashConfig[]
 }
 
-export function UserList({ users }: UserListProps) {
+export function UserList({ users, clashConfigs }: UserListProps) {
   const [baseUrl, setBaseUrl] = useState("")
 
   useEffect(() => {
@@ -60,7 +61,7 @@ export function UserList({ users }: UserListProps) {
                     <FileJson className="h-4 w-4 text-muted-foreground" />
                     <span className="text-muted-foreground">配置：</span>
                     {user.mergeConfigId ? (
-                      <IdBadge id={user.mergeConfigId} />
+                      clashConfigs.find((c) => c.id === user.mergeConfigId)?.name || <IdBadge id={user.mergeConfigId} />
                     ) : (
                       <Badge variant="outline">默认</Badge>
                     )}

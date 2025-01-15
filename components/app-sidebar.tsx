@@ -3,6 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import { Box, Cog, FileJson, Home, Link2, LogOut, Users, ExternalLink, type LucideIcon } from "lucide-react";
 import { toast } from "sonner";
+import pkg from "@/package.json";
 
 import { ThemeToggle } from "@/components/theme-toggle";
 import {
@@ -83,10 +84,10 @@ export function AppSidebar({ className, ...props }: React.ComponentProps<typeof 
       if (!res.ok) {
         throw new Error("Logout failed");
       }
-
+      toast.success("已退出登录");
       router.push("/login");
       router.refresh();
-    } catch (error) {
+    } catch (_error) {
       toast.error("退出登录失败");
     }
   }
@@ -104,7 +105,7 @@ export function AppSidebar({ className, ...props }: React.ComponentProps<typeof 
                   </div>
                   <div className="grid flex-1 text-sm leading-tight">
                     <span className="font-semibold">Sub Box</span>
-                    <span className="text-xs text-muted-foreground">订阅管理</span>
+                    <span className="text-xs text-muted-foreground">v{pkg.version}</span>
                   </div>
                 </div>
               {/* </SidebarMenuButton>

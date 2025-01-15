@@ -8,7 +8,7 @@ import { DateTime } from "@/components/date-time";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { IdBadge } from "@/components/id-badge";
 import { Button } from "@/components/ui/button";
-import { type User } from "@/types";
+import { type User, type ClashConfig } from "@/types";
 
 interface UserActionsProps {
   user: User;
@@ -35,9 +35,10 @@ interface CreateColumnsOptions {
   baseUrl: string;
   onEdit: (user: User) => void;
   onDelete: (user: User) => void;
+  clashConfigs: ClashConfig[];
 }
 
-export function createColumns({ baseUrl, onEdit, onDelete }: CreateColumnsOptions): ColumnDef<User>[] {
+export function createColumns({ baseUrl, onEdit, onDelete, clashConfigs }: CreateColumnsOptions): ColumnDef<User>[] {
   return [
     {
       accessorKey: "id",
@@ -73,7 +74,12 @@ export function createColumns({ baseUrl, onEdit, onDelete }: CreateColumnsOption
     {
       accessorKey: "mergeConfigId",
       header: ({ column }) => <DataTableColumnHeader column={column} title="Clash 配置" />,
-      cell: ({ row }) => (row.original.mergeConfigId ? <IdBadge id={row.original.mergeConfigId} /> : "-"),
+      cell: ({ row }) => {
+        const configId = row.original.mergeConfigId;
+        if (!configId) return "-";
+        const config = clashConfigs.find((c) => c.id === configId);
+        return config ? config.name : configId;
+      },
       meta: {
         title: "Clash 配置",
       },

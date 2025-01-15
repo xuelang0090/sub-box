@@ -38,7 +38,7 @@ export default async function MainLayout({
               </Breadcrumb>
             </div>
           </header>
-          <div className="flex flex-1 flex-col">
+          <div className="flex flex-1 flex-col p-4 pt-0">
             {children}
           </div>
         </div>

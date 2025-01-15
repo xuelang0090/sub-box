@@ -12,7 +12,7 @@ export default async function Home() {
   const clashConfigs = await clashConfigService.getAll()
 
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+    <div className="flex flex-1 flex-col gap-4">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader>
@@ -52,7 +52,7 @@ export default async function Home() {
           <CardTitle>用户列表</CardTitle>
         </CardHeader>
         <CardContent>
-          <UserList users={users} />
+          <UserList users={users} clashConfigs={clashConfigs} />
         </CardContent>
       </Card>
     </div>

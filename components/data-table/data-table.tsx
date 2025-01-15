@@ -23,6 +23,7 @@ interface DataTableProps<TData extends { id: string }> {
   columns: ColumnDef<TData, unknown>[];
   data: TData[];
   expandedContent?: (item: TData) => React.ReactNode;
+  expandedTitle?: string | ((item: TData) => string);
   defaultExpanded?: boolean;
   enableColumnVisibility?: boolean;
   enableGlobalSearch?: boolean;
@@ -34,6 +35,7 @@ export function DataTable<TData extends { id: string }>({
   columns,
   data,
   expandedContent,
+  expandedTitle,
   defaultExpanded = false,
   enableColumnVisibility = false,
   enableGlobalSearch = false,
@@ -42,7 +44,15 @@ export function DataTable<TData extends { id: string }>({
 }: DataTableProps<TData>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const [expandedRows, setExpandedRows] = useState<Set<string>>(() => (defaultExpanded ? new Set(data.map((item) => item.id)) : new Set()));
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(() => {
+    if (defaultExpanded) {
+      return new Set(data.map((item) => item.id));
+    }
+    if (getItemCount) {
+      return new Set(data.filter(item => getItemCount(item) > 0).map(item => item.id));
+    }
+    return new Set();
+  });
   const [globalFilter, setGlobalFilter] = useState("");
 
   const table = useReactTable({
@@ -162,8 +172,15 @@ export function DataTable<TData extends { id: string }>({
                 </TableRow>,
                 expandedContent && expandedRows.has(row.original.id) && (
                   <TableRow key={`${row.id}-expanded`}>
-                    <TableCell colSpan={columns.length + 1} className="p-0 pl-20 pr-2">
-                      {expandedContent(row.original)}
+                    <TableCell colSpan={columns.length + 1} className="p-0">
+                      {expandedTitle && (
+                        <div className="pl-20 pr-2 py-2 font-medium text-lg mt-2">
+                          {typeof expandedTitle === "function" ? expandedTitle(row.original) : expandedTitle}
+                        </div>
+                      )}
+                      <div className={cn("pl-20 pr-2 pb-4", !expandedTitle && "pt-2")}>
+                        {expandedContent(row.original)}
+                      </div>
                     </TableCell>
                   </TableRow>
                 ),

@@ -68,6 +68,7 @@ export function NodeTable({ nodes, users }: NodeTableProps) {
             users={users}
           />
         )}
+        expandedTitle={(node) => `节点 ${node.name} 的客户端列表 (${node.items.length})`}
         enableColumnVisibility
         enableGlobalSearch
         getItemCount={(node) => node.items.length}
