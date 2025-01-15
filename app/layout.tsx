@@ -45,12 +45,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="zh-CN" suppressHydrationWarning>
       <body className={cn(inter.className, "min-h-screen")}>
         <ThemeProvider attribute="class" defaultTheme={defaultTheme} enableSystem disableTransitionOnChange>
-          <SidebarProvider>
-            <AppSidebar />
-            <SidebarInset>
-              <main className="container mx-auto py-6 px-4 md:px-6">{children}</main>
-            </SidebarInset>
-          </SidebarProvider>
+          {children}
           <Toaster />
         </ThemeProvider>
       </body>

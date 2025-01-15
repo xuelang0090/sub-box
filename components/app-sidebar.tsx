@@ -1,7 +1,8 @@
 "use client";
 
-import { usePathname } from "next/navigation";
-import { Cog, FileJson, Home, Link2, Users, type LucideIcon } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { Cog, FileJson, Home, Link2, LogOut, Users, type LucideIcon } from "lucide-react";
+import { toast } from "sonner";
 
 import { ThemeToggle } from "@/components/theme-toggle";
 import {
@@ -16,6 +17,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
 
 interface NavItem {
   title: string;
@@ -53,6 +55,24 @@ const navItems: NavItem[] = [
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  async function handleLogout() {
+    try {
+      const res = await fetch("/api/logout", {
+        method: "POST",
+      });
+
+      if (!res.ok) {
+        throw new Error("Logout failed");
+      }
+
+      router.push("/login");
+      router.refresh();
+    } catch (error) {
+      toast.error("退出登录失败");
+    }
+  }
 
   return (
     <Sidebar {...props}>
@@ -75,8 +95,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter className="flex justify-center">
+      <SidebarFooter className="!flex-row justify-between px-2">
         <ThemeToggle />
+        <Button variant="ghost" size="icon" onClick={handleLogout}>
+          <LogOut className="h-4 w-4" />
+          <span className="sr-only">退出登录</span>
+        </Button>
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
