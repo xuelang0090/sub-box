@@ -8,9 +8,11 @@ export default async function ClashConfigsPage() {
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-        <CardTitle>Clash 配置 ({configs.length})</CardTitle>
-        <CreateClashConfigDialog />
+      <CardHeader className="flex flex-row items-center space-y-0 pb-4">
+        <div className="flex items-center gap-4">
+          <CardTitle>Clash 配置 ({configs.length})</CardTitle>
+          <CreateClashConfigDialog />
+        </div>
       </CardHeader>
       <CardContent>
         <ClashConfigTable configs={configs} />

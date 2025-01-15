@@ -11,9 +11,11 @@ export default async function UsersPage() {
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-        <CardTitle>用户管理 ({users.length})</CardTitle>
-        <CreateUserDialog />
+      <CardHeader className="flex flex-row items-center space-y-0 pb-4">
+        <div className="flex items-center gap-4">
+          <CardTitle>用户管理 ({users.length})</CardTitle>
+          <CreateUserDialog />
+        </div>
       </CardHeader>
       <CardContent>
         <Suspense fallback={<div>加载中...</div>}>

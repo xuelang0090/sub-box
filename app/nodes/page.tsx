@@ -9,9 +9,11 @@ export default async function SubscriptionsPage() {
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-        <CardTitle>节点管理 ({nodes.length})</CardTitle>
-        <CreateNodeDialog />
+      <CardHeader className="flex flex-row items-center space-y-0 pb-4">
+        <div className="flex items-center gap-4">
+          <CardTitle>节点管理 ({nodes.length})</CardTitle>
+          <CreateNodeDialog />
+        </div>
       </CardHeader>
       <CardContent>
         <NodeTable nodes={nodes} users={users} />
