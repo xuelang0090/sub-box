@@ -74,6 +74,10 @@ class NodeClientService {
       return this.create({ ...data, nodeId, userId });
     }
   }
+
+  async getByUserId(userId: string): Promise<NodeClient[]> {
+    return db.select().from(nodeClients).where(eq(nodeClients.userId, userId));
+  }
 }
 
 export const nodeClientService = new NodeClientService();

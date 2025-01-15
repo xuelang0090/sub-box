@@ -2,10 +2,17 @@ import "server-only";
 
 import crypto from "crypto";
 import { eq } from "drizzle-orm";
+import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
 
 import { type ClashConfig } from "@/types";
 import db from "../db";
 import { clashConfigs } from "../db/schema";
+
+// Define type for Clash configuration object
+type ClashYamlConfig = {
+  rules?: string[];
+  [key: string]: unknown;
+};
 
 class ClashConfigService {
   async getAll(): Promise<ClashConfig[]> {
@@ -16,6 +23,7 @@ class ClashConfigService {
     const results = await db.select().from(clashConfigs).where(eq(clashConfigs.id, id)).limit(1);
     return results[0] || null;
   }
+  
 
   async create(data: Omit<ClashConfig, "id" | "createdAt" | "updatedAt">): Promise<ClashConfig> {
     const now = new Date().toISOString();
@@ -51,6 +59,49 @@ class ClashConfigService {
 
   async delete(id: string): Promise<void> {
     await db.delete(clashConfigs).where(eq(clashConfigs.id, id));
+  }
+
+  async mergeConfig(baseYaml: string, config: ClashConfig): Promise<string> {
+    let finalConfig: ClashYamlConfig = parseYaml(baseYaml);
+
+    // Step 1: Merge global config if exists
+    if (config.globalConfig) {
+      const globalConfig: ClashYamlConfig = parseYaml(config.globalConfig);
+      
+      // Create a new object with the order from globalConfig first
+      const orderedConfig: ClashYamlConfig = {};
+      
+      // First, add all keys from globalConfig
+      for (const key in globalConfig) {
+        orderedConfig[key] = globalConfig[key];
+      }
+      console.log("orderedConfig", Object.keys(orderedConfig).length);
+      
+      // Then, add remaining keys from finalConfig that don't exist in globalConfig
+      for (const key in finalConfig) {
+        if (!(key in orderedConfig)) {
+          orderedConfig[key] = finalConfig[key];
+        }
+      }
+      console.log("orderedConfig", Object.keys(orderedConfig).length);
+      finalConfig = orderedConfig;
+    }
+
+    // Step 2: Prepend rules if exists
+    if (config.rules) {
+      const newRules = config.rules
+        .split("\n")
+        .map((line) => line.trim())
+        .filter((line) => line.length > 0);
+
+      if (!finalConfig.rules) {
+        finalConfig.rules = [];
+      }
+
+      finalConfig.rules = [...newRules, ...finalConfig.rules];
+    }
+
+    return stringifyYaml(finalConfig);
   }
 }
 

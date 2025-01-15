@@ -45,7 +45,7 @@ export const clashConfigs = sqliteTable("clash_configs", {
   key: text("key").notNull().unique(),
   name: text("name").notNull(),
   globalConfig: text("global_config"), // YAML string
-  rules: text("rules"), // YAML string
+  rules: text("rules"), // 每行一个
   createdAt: text("created_at").notNull(),
   updatedAt: text("updated_at").notNull(),
 });

@@ -1,40 +1,31 @@
 import "server-only";
 
-import { eq } from "drizzle-orm";
-
-import db from "../db";
-import { nodeClients, users } from "../db/schema";
+import { type NodeClient, type Subconverter } from "@/types";
 import { subconverterService } from "./subconverter-service";
-import { nodeClientService } from "./node-client-service";
-import { userService } from "./user-service";
 
 class SubscriptionService {
-  async generateSubscription(subscriptionKey: string): Promise<string> {
-    // Find user by subscription key
-    const userResults = await db.select().from(users).where(eq(users.subscriptionKey, subscriptionKey)).limit(1);
+  async generateSubscription(params: {
+    enabledClients: NodeClient[];
+    subconverterId?: string | null;
+  }): Promise<string> {
+    const { enabledClients, subconverterId } = params;
 
-    const user = userResults[0];
-    if (!user) {
-      throw new Error("User not found");
-    }
-
-    // Get all enabled node clients for the user
-    const clients = await db.select().from(nodeClients).where(eq(nodeClients.userId, user.id));
-
-    const enabledClients = clients.filter((client) => client.enable);
     if (enabledClients.length === 0) {
       throw new Error("No enabled nodes found");
     }
 
-    // Get subconverter - either user's or default one
-    let subconverter = null;
-    if (user.subconverterId) {
-      subconverter = await subconverterService.get(user.subconverterId);
+    // Get subconverter - either specified one or default one
+    let subconverter: Subconverter | null = null;
+    if (subconverterId) {
+      subconverter = await subconverterService.get(subconverterId);
     }
 
     if (!subconverter) {
       const allSubconverters = await subconverterService.getAll();
-      subconverter = allSubconverters.find((s) => s.isDefault);
+      const defaultSubconverter = allSubconverters.find((s) => s.isDefault);
+      if (defaultSubconverter) {
+        subconverter = defaultSubconverter;
+      }
     }
 
     if (!subconverter) {

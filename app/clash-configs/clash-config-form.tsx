@@ -135,7 +135,7 @@ export function ClashConfigForm({ config, onSuccess }: ClashConfigFormProps) {
             <FormItem>
               <FormLabel>规则</FormLabel>
               <FormControl>
-                <Textarea {...field} value={value ?? ""} placeholder="# YAML 格式" className="font-mono" rows={10} />
+                <Textarea {...field} value={value ?? ""} placeholder="规则格式: TYPE,VALUE,PROXY" className="font-mono" rows={10} />
               </FormControl>
               <FormMessage />
             </FormItem>

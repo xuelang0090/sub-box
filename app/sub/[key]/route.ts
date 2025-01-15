@@ -1,11 +1,48 @@
 import { NextResponse } from "next/server";
+import { eq } from "drizzle-orm";
 
+import { clashConfigService } from "@/server/services/clash-config-service";
 import { subscriptionService } from "@/server/services/subscription-service";
+import { userService } from "@/server/services/user-service";
+import { nodeClientService } from "@/server/services/node-client-service";
+import { type NodeClient } from "@/types";
 
 export async function GET(_request: Request, { params }: { params: { key: string } }) {
   try {
-    const yaml = await subscriptionService.generateSubscription(params.key);
-    return new NextResponse(yaml, {
+    // 1. 查找用户
+    const user = await userService.findBySubscriptionKey(params.key);
+    if (!user) {
+      return new NextResponse(
+        JSON.stringify({ error: "User not found" }),
+        {
+          status: 404,
+          headers: {
+            "Content-Type": "application/json; charset=utf-8",
+          },
+        }
+      );
+    }
+
+    // 2. 获取用户的所有已启用节点
+    const allClients = await nodeClientService.getByUserId(user.id);
+    const enabledClients = allClients.filter((client: NodeClient) => client.enable);
+
+    // 3. 生成订阅内容
+    const originalYaml = await subscriptionService.generateSubscription({
+      enabledClients,
+      subconverterId: user.subconverterId,
+    });
+
+    // 4. 查找对应的 Clash 配置
+    const config = user.mergeConfigId ? await clashConfigService.get(user.mergeConfigId) : null;
+
+    // 5. 如果找到配置，则进行合并
+    const finalYaml = config
+      ? await clashConfigService.mergeConfig(originalYaml, config)
+      : originalYaml;
+
+    // 6. 返回最终的 YAML
+    return new NextResponse(finalYaml, {
       headers: {
         "Content-Type": "text/yaml; charset=utf-8",
       },
