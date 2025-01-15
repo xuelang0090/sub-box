@@ -14,28 +14,31 @@ function rowToSubconverter(row: SubconverterRow): Subconverter {
 }
 
 class SubconverterService {
-  private db!: Database;
+  private dbPromise: Promise<Database>;
 
   constructor() {
-    this.init();
+    this.dbPromise = db();
   }
 
-  private async init() {
-    this.db = await db();
+  private async getDb() {
+    return await this.dbPromise;
   }
 
   async getAll(): Promise<Subconverter[]> {
-    const results = await this.db.select().from(subconverters);
+    const db = await this.getDb();
+    const results = await db.select().from(subconverters);
     return results.map(rowToSubconverter);
   }
 
   async get(id: string): Promise<Subconverter | null> {
-    const results = await this.db.select().from(subconverters).where(eq(subconverters.id, id)).limit(1);
+    const db = await this.getDb();
+    const results = await db.select().from(subconverters).where(eq(subconverters.id, id)).limit(1);
 
     return results[0] ? rowToSubconverter(results[0]) : null;
   }
 
   async create(data: Omit<Subconverter, "id" | "createdAt" | "updatedAt">): Promise<Subconverter> {
+    const db = await this.getDb();
     const now = new Date().toISOString();
     const item = {
       ...data,
@@ -44,7 +47,7 @@ class SubconverterService {
       updatedAt: now,
     };
 
-    const results = await this.db.insert(subconverters).values(item).returning();
+    const results = await db.insert(subconverters).values(item).returning();
     if (!results[0]) {
       throw new Error("Failed to create subconverter");
     }
@@ -52,13 +55,14 @@ class SubconverterService {
   }
 
   async update(id: string, data: Partial<Omit<Subconverter, "id" | "createdAt" | "updatedAt">>): Promise<Subconverter> {
+    const db = await this.getDb();
     const now = new Date().toISOString();
     const updateData = {
       ...data,
       updatedAt: now,
     };
 
-    const results = await this.db.update(subconverters).set(updateData).where(eq(subconverters.id, id)).returning();
+    const results = await db.update(subconverters).set(updateData).where(eq(subconverters.id, id)).returning();
 
     if (!results[0]) {
       throw new Error(`Subconverter with id ${id} not found`);
@@ -68,7 +72,8 @@ class SubconverterService {
   }
 
   async delete(id: string): Promise<void> {
-    await this.db.delete(subconverters).where(eq(subconverters.id, id));
+    const db = await this.getDb();
+    await db.delete(subconverters).where(eq(subconverters.id, id));
   }
 }
 

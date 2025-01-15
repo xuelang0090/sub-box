@@ -8,26 +8,29 @@ import { db, type Database } from "../db";
 import { users } from "../db/schema";
 
 class UserService {
-  private db!: Database;
+  private dbPromise: Promise<Database>;
 
   constructor() {
-    this.init();
+    this.dbPromise = db();
   }
 
-  private async init() {
-    this.db = await db();
+  private async getDb() {
+    return await this.dbPromise;
   }
 
   async getAll(): Promise<User[]> {
-    return this.db.select().from(users);
+    const db = await this.getDb();
+    return db.select().from(users);
   }
 
   async get(id: string): Promise<User | null> {
-    const results = await this.db.select().from(users).where(eq(users.id, id)).limit(1);
+    const db = await this.getDb();
+    const results = await db.select().from(users).where(eq(users.id, id)).limit(1);
     return results[0] || null;
   }
 
   async create(data: Omit<User, "id" | "createdAt" | "updatedAt">): Promise<User> {
+    const db = await this.getDb();
     const now = new Date().toISOString();
     const item = {
       ...data,
@@ -36,7 +39,7 @@ class UserService {
       updatedAt: now,
     };
 
-    const results = await this.db.insert(users).values(item).returning();
+    const results = await db.insert(users).values(item).returning();
     if (!results[0]) {
       throw new Error("Failed to create user");
     }
@@ -44,13 +47,14 @@ class UserService {
   }
 
   async update(id: string, data: Partial<Omit<User, "id" | "createdAt" | "updatedAt">>): Promise<User> {
+    const db = await this.getDb();
     const now = new Date().toISOString();
     const updateData = {
       ...data,
       updatedAt: now,
     };
 
-    const results = await this.db.update(users).set(updateData).where(eq(users.id, id)).returning();
+    const results = await db.update(users).set(updateData).where(eq(users.id, id)).returning();
 
     if (!results[0]) {
       throw new Error(`User with id ${id} not found`);
@@ -60,11 +64,13 @@ class UserService {
   }
 
   async delete(id: string): Promise<void> {
-    await this.db.delete(users).where(eq(users.id, id));
+    const db = await this.getDb();
+    await db.delete(users).where(eq(users.id, id));
   }
 
   async findBySubscriptionKey(subscriptionKey: string): Promise<User | null> {
-    const results = await this.db.select().from(users).where(eq(users.subscriptionKey, subscriptionKey)).limit(1);
+    const db = await this.getDb();
+    const results = await db.select().from(users).where(eq(users.subscriptionKey, subscriptionKey)).limit(1);
     return results[0] || null;
   }
 }

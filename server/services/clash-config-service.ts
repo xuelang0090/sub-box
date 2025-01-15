@@ -15,27 +15,29 @@ type ClashYamlConfig = {
 };
 
 class ClashConfigService {
-  private db!: Database;
+  private dbPromise: Promise<Database>;
 
   constructor() {
-    this.init();
+    this.dbPromise = db();
   }
 
-  private async init() {
-    this.db = await db();
+  private async getDb() {
+    return await this.dbPromise;
   }
 
   async getAll(): Promise<ClashConfig[]> {
-    return this.db.select().from(clashConfigs);
+    const db = await this.getDb();
+    return db.select().from(clashConfigs);
   }
 
   async get(id: string): Promise<ClashConfig | null> {
-    const results = await this.db.select().from(clashConfigs).where(eq(clashConfigs.id, id)).limit(1);
+    const db = await this.getDb();
+    const results = await db.select().from(clashConfigs).where(eq(clashConfigs.id, id)).limit(1);
     return results[0] || null;
   }
-  
 
   async create(data: Omit<ClashConfig, "id" | "createdAt" | "updatedAt">): Promise<ClashConfig> {
+    const db = await this.getDb();
     const now = new Date().toISOString();
     const item = {
       ...data,
@@ -44,7 +46,7 @@ class ClashConfigService {
       updatedAt: now,
     };
 
-    const results = await this.db.insert(clashConfigs).values(item).returning();
+    const results = await db.insert(clashConfigs).values(item).returning();
     if (!results[0]) {
       throw new Error("Failed to create subscription source");
     }
@@ -52,13 +54,14 @@ class ClashConfigService {
   }
 
   async update(id: string, data: Partial<Omit<ClashConfig, "id" | "createdAt" | "updatedAt">>): Promise<ClashConfig> {
+    const db = await this.getDb();
     const now = new Date().toISOString();
     const updateData = {
       ...data,
       updatedAt: now,
     };
 
-    const results = await this.db.update(clashConfigs).set(updateData).where(eq(clashConfigs.id, id)).returning();
+    const results = await db.update(clashConfigs).set(updateData).where(eq(clashConfigs.id, id)).returning();
 
     if (!results[0]) {
       throw new Error(`Config with id ${id} not found`);
@@ -68,7 +71,8 @@ class ClashConfigService {
   }
 
   async delete(id: string): Promise<void> {
-    await this.db.delete(clashConfigs).where(eq(clashConfigs.id, id));
+    const db = await this.getDb();
+    await db.delete(clashConfigs).where(eq(clashConfigs.id, id));
   }
 
   async mergeConfig(baseYaml: string, config: ClashConfig): Promise<string> {

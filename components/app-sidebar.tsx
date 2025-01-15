@@ -1,9 +1,10 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { Box, Cog, FileJson, Home, Link2, LogOut, Users, ExternalLink, type LucideIcon } from "lucide-react";
+import { Box, Cog, FileJson, Home, Link2, LogOut, Users, ExternalLink, type LucideIcon, FileText } from "lucide-react";
 import { toast } from "sonner";
 import pkg from "@/package.json";
+import Link from "next/link";
 
 import { ThemeToggle } from "@/components/theme-toggle";
 import {
@@ -60,13 +61,13 @@ const docItems: NavItem[] = [
   {
     title: "文档",
     href: "https://github.com/moezx/sub-box",
-    icon: ExternalLink,
+    icon: FileText,
     external: true,
   },
   {
     title: "API",
     href: "https://github.com/moezx/sub-box/wiki/API",
-    icon: ExternalLink,
+    icon: FileText,
     external: true,
   },
 ];
@@ -123,10 +124,10 @@ export function AppSidebar({ className, ...props }: React.ComponentProps<typeof 
                     isActive={pathname === item.href}
                     tooltip={item.title}
                   >
-                    <a href={item.href}>
+                    <Link href={item.href}>
                       <item.icon className="h-4 w-4" />
                       <span>{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -143,9 +144,10 @@ export function AppSidebar({ className, ...props }: React.ComponentProps<typeof 
                     asChild 
                     tooltip={item.title}
                   >
-                    <a href={item.href} target="_blank" rel="noopener noreferrer">
+                    <a href={item.href} target="_blank" rel="noopener noreferrer" className="group">
                       <item.icon className="h-4 w-4" />
-                      <span>{item.title}</span>
+                      <span className="flex-1">{item.title}</span>
+                      <ExternalLink className="h-3 w-3 text-muted-foreground" />
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
