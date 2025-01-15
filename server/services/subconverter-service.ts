@@ -4,7 +4,7 @@ import crypto from "crypto";
 import { eq } from "drizzle-orm";
 
 import { type Subconverter, type SubconverterRow } from "@/types";
-import db from "../db";
+import { db, type Database } from "../db";
 import { subconverters } from "../db/schema";
 
 function rowToSubconverter(row: SubconverterRow): Subconverter {
@@ -14,13 +14,23 @@ function rowToSubconverter(row: SubconverterRow): Subconverter {
 }
 
 class SubconverterService {
+  private db!: Database;
+
+  constructor() {
+    this.init();
+  }
+
+  private async init() {
+    this.db = await db();
+  }
+
   async getAll(): Promise<Subconverter[]> {
-    const results = await db.select().from(subconverters);
+    const results = await this.db.select().from(subconverters);
     return results.map(rowToSubconverter);
   }
 
   async get(id: string): Promise<Subconverter | null> {
-    const results = await db.select().from(subconverters).where(eq(subconverters.id, id)).limit(1);
+    const results = await this.db.select().from(subconverters).where(eq(subconverters.id, id)).limit(1);
 
     return results[0] ? rowToSubconverter(results[0]) : null;
   }
@@ -34,7 +44,7 @@ class SubconverterService {
       updatedAt: now,
     };
 
-    const results = await db.insert(subconverters).values(item).returning();
+    const results = await this.db.insert(subconverters).values(item).returning();
     if (!results[0]) {
       throw new Error("Failed to create subconverter");
     }
@@ -48,7 +58,7 @@ class SubconverterService {
       updatedAt: now,
     };
 
-    const results = await db.update(subconverters).set(updateData).where(eq(subconverters.id, id)).returning();
+    const results = await this.db.update(subconverters).set(updateData).where(eq(subconverters.id, id)).returning();
 
     if (!results[0]) {
       throw new Error(`Subconverter with id ${id} not found`);
@@ -58,7 +68,7 @@ class SubconverterService {
   }
 
   async delete(id: string): Promise<void> {
-    await db.delete(subconverters).where(eq(subconverters.id, id));
+    await this.db.delete(subconverters).where(eq(subconverters.id, id));
   }
 }
 

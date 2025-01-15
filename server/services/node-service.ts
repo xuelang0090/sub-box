@@ -4,16 +4,26 @@ import crypto from "crypto";
 import { eq } from "drizzle-orm";
 
 import { type Node } from "@/types";
-import db from "../db";
+import { db, type Database } from "../db";
 import { nodes } from "../db/schema";
 
 class NodeService {
+  private db!: Database;
+
+  constructor() {
+    this.init();
+  }
+
+  private async init() {
+    this.db = await db();
+  }
+
   async getAll(): Promise<Node[]> {
-    return db.select().from(nodes);
+    return this.db.select().from(nodes);
   }
 
   async get(id: string): Promise<Node | null> {
-    const results = await db.select().from(nodes).where(eq(nodes.id, id)).limit(1);
+    const results = await this.db.select().from(nodes).where(eq(nodes.id, id)).limit(1);
     return results[0] || null;
   }
 
@@ -26,7 +36,7 @@ class NodeService {
       updatedAt: now,
     };
 
-    const results = await db.insert(nodes).values(item).returning();
+    const results = await this.db.insert(nodes).values(item).returning();
     if (!results[0]) {
       throw new Error("Failed to create node");
     }
@@ -40,7 +50,7 @@ class NodeService {
       updatedAt: now,
     };
 
-    const results = await db.update(nodes).set(updateData).where(eq(nodes.id, id)).returning();
+    const results = await this.db.update(nodes).set(updateData).where(eq(nodes.id, id)).returning();
 
     if (!results[0]) {
       throw new Error(`Node with id ${id} not found`);
@@ -50,7 +60,7 @@ class NodeService {
   }
 
   async delete(id: string): Promise<void> {
-    await db.delete(nodes).where(eq(nodes.id, id));
+    await this.db.delete(nodes).where(eq(nodes.id, id));
   }
 }
 

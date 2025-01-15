@@ -5,7 +5,7 @@ import { eq } from "drizzle-orm";
 import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
 
 import { type ClashConfig } from "@/types";
-import db from "../db";
+import { db, type Database } from "../db";
 import { clashConfigs } from "../db/schema";
 
 // Define type for Clash configuration object
@@ -15,12 +15,22 @@ type ClashYamlConfig = {
 };
 
 class ClashConfigService {
+  private db!: Database;
+
+  constructor() {
+    this.init();
+  }
+
+  private async init() {
+    this.db = await db();
+  }
+
   async getAll(): Promise<ClashConfig[]> {
-    return db.select().from(clashConfigs);
+    return this.db.select().from(clashConfigs);
   }
 
   async get(id: string): Promise<ClashConfig | null> {
-    const results = await db.select().from(clashConfigs).where(eq(clashConfigs.id, id)).limit(1);
+    const results = await this.db.select().from(clashConfigs).where(eq(clashConfigs.id, id)).limit(1);
     return results[0] || null;
   }
   
@@ -34,7 +44,7 @@ class ClashConfigService {
       updatedAt: now,
     };
 
-    const results = await db.insert(clashConfigs).values(item).returning();
+    const results = await this.db.insert(clashConfigs).values(item).returning();
     if (!results[0]) {
       throw new Error("Failed to create subscription source");
     }
@@ -48,7 +58,7 @@ class ClashConfigService {
       updatedAt: now,
     };
 
-    const results = await db.update(clashConfigs).set(updateData).where(eq(clashConfigs.id, id)).returning();
+    const results = await this.db.update(clashConfigs).set(updateData).where(eq(clashConfigs.id, id)).returning();
 
     if (!results[0]) {
       throw new Error(`Config with id ${id} not found`);
@@ -58,7 +68,7 @@ class ClashConfigService {
   }
 
   async delete(id: string): Promise<void> {
-    await db.delete(clashConfigs).where(eq(clashConfigs.id, id));
+    await this.db.delete(clashConfigs).where(eq(clashConfigs.id, id));
   }
 
   async mergeConfig(baseYaml: string, config: ClashConfig): Promise<string> {

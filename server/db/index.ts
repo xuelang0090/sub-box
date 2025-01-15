@@ -1,8 +1,11 @@
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { drizzle } from "drizzle-orm/d1";
+import { type DrizzleD1Database } from "drizzle-orm/d1";
 
 import { env } from "@/env";
 import * as schema from "./schema";
+
+export type Database = DrizzleD1Database<typeof schema>;
 
 /**
  * Cache the database connection in development. This avoids creating a new connection on every HMR

@@ -4,16 +4,26 @@ import crypto from "crypto";
 import { eq } from "drizzle-orm";
 
 import { type User } from "@/types";
-import db from "../db";
+import { db, type Database } from "../db";
 import { users } from "../db/schema";
 
 class UserService {
+  private db!: Database;
+
+  constructor() {
+    this.init();
+  }
+
+  private async init() {
+    this.db = await db();
+  }
+
   async getAll(): Promise<User[]> {
-    return db.select().from(users);
+    return this.db.select().from(users);
   }
 
   async get(id: string): Promise<User | null> {
-    const results = await db.select().from(users).where(eq(users.id, id)).limit(1);
+    const results = await this.db.select().from(users).where(eq(users.id, id)).limit(1);
     return results[0] || null;
   }
 
@@ -26,7 +36,7 @@ class UserService {
       updatedAt: now,
     };
 
-    const results = await db.insert(users).values(item).returning();
+    const results = await this.db.insert(users).values(item).returning();
     if (!results[0]) {
       throw new Error("Failed to create user");
     }
@@ -40,7 +50,7 @@ class UserService {
       updatedAt: now,
     };
 
-    const results = await db.update(users).set(updateData).where(eq(users.id, id)).returning();
+    const results = await this.db.update(users).set(updateData).where(eq(users.id, id)).returning();
 
     if (!results[0]) {
       throw new Error(`User with id ${id} not found`);
@@ -50,11 +60,11 @@ class UserService {
   }
 
   async delete(id: string): Promise<void> {
-    await db.delete(users).where(eq(users.id, id));
+    await this.db.delete(users).where(eq(users.id, id));
   }
 
   async findBySubscriptionKey(subscriptionKey: string): Promise<User | null> {
-    const results = await db.select().from(users).where(eq(users.subscriptionKey, subscriptionKey)).limit(1);
+    const results = await this.db.select().from(users).where(eq(users.subscriptionKey, subscriptionKey)).limit(1);
     return results[0] || null;
   }
 }

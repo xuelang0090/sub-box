@@ -4,16 +4,26 @@ import crypto from "crypto";
 import { and, eq } from "drizzle-orm";
 
 import { type NodeClient } from "@/types";
-import db from "../db";
+import { db, type Database } from "../db";
 import { nodeClients } from "../db/schema";
 
 class NodeClientService {
+  private db!: Database;
+
+  constructor() {
+    this.init();
+  }
+
+  private async init() {
+    this.db = await db();
+  }
+
   async getAll(): Promise<NodeClient[]> {
-    return db.select().from(nodeClients);
+    return this.db.select().from(nodeClients);
   }
 
   async get(id: string): Promise<NodeClient | null> {
-    const results = await db.select().from(nodeClients).where(eq(nodeClients.id, id)).limit(1);
+    const results = await this.db.select().from(nodeClients).where(eq(nodeClients.id, id)).limit(1);
     return results[0] || null;
   }
 
@@ -26,7 +36,7 @@ class NodeClientService {
       updatedAt: now,
     };
 
-    const results = await db.insert(nodeClients).values(item).returning();
+    const results = await this.db.insert(nodeClients).values(item).returning();
     if (!results[0]) {
       throw new Error("Failed to create node client");
     }
@@ -40,7 +50,7 @@ class NodeClientService {
       updatedAt: now,
     };
 
-    const results = await db.update(nodeClients).set(updateData).where(eq(nodeClients.id, id)).returning();
+    const results = await this.db.update(nodeClients).set(updateData).where(eq(nodeClients.id, id)).returning();
 
     if (!results[0]) {
       throw new Error(`Node client with id ${id} not found`);
@@ -50,11 +60,11 @@ class NodeClientService {
   }
 
   async delete(id: string): Promise<void> {
-    await db.delete(nodeClients).where(eq(nodeClients.id, id));
+    await this.db.delete(nodeClients).where(eq(nodeClients.id, id));
   }
 
   async findByNodeAndUser(nodeId: string, userId: string): Promise<NodeClient | null> {
-    const results = await db
+    const results = await this.db
       .select()
       .from(nodeClients)
       .where(and(eq(nodeClients.nodeId, nodeId), eq(nodeClients.userId, userId)))
@@ -76,7 +86,7 @@ class NodeClientService {
   }
 
   async getByUserId(userId: string): Promise<NodeClient[]> {
-    return db.select().from(nodeClients).where(eq(nodeClients.userId, userId));
+    return this.db.select().from(nodeClients).where(eq(nodeClients.userId, userId));
   }
 }
 
