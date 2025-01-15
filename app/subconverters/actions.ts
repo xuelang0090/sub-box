@@ -21,7 +21,7 @@ export async function verifySubconverterUrl(url: string) {
       throw new Error("验证失败")
     }
     return await response.text()
-  } catch (error) {
+  } catch (_error) {
     throw new Error("验证失败：无法连接到服务器")
   }
 }

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import { subscriptionService } from "@/server/services/subscription-service"
 
 export async function GET(
-  request: Request,
+  _request: Request,
   { params }: { params: { key: string } }
 ) {
   try {

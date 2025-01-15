@@ -47,7 +47,7 @@ export function DateTime({ date, format = "datetime" }: DateTimeProps) {
         {d.toLocaleString('zh-CN', options)}
       </time>
     )
-  } catch (error) {
+  } catch (_error) {
     return <span>Invalid Date</span>
   }
 } 

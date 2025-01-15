@@ -29,6 +29,9 @@ class SubscriptionSourceService {
     }
 
     const results = await db.insert(subscriptionSources).values(item).returning()
+    if (!results[0]) {
+      throw new Error("Failed to create subscription source")
+    }
     return results[0]
   }
 

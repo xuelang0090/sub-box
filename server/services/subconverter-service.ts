@@ -37,6 +37,9 @@ class SubconverterService {
     };
 
     const results = await db.insert(subconverters).values(item).returning();
+    if (!results[0]) {
+      throw new Error("Failed to create subconverter");
+    }
     return rowToSubconverter(results[0]);
   }
 

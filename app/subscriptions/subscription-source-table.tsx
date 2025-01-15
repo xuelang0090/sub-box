@@ -25,17 +25,16 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { PopupSheet } from "@/components/popup-sheet"
-import { type SubscriptionSource, type User } from "@/types"
+import { type SubscriptionSource, type User, type SubscriptionSourceItem } from "@/types"
 import { IdBadge } from "@/components/id-badge"
 import { DateTime } from "@/components/date-time"
-import { cn } from "@/lib/utils"
 
 import { deleteSubscriptionSource } from "./actions"
 import { SubscriptionSourceForm } from "./subscription-source-form"
 import { SubscriptionSourceItemTable } from "./subscription-source-item-table"
 
 interface SubscriptionSourceTableProps {
-  sources: (SubscriptionSource & { items: any[] })[]
+  sources: (SubscriptionSource & { items: SubscriptionSourceItem[] })[]
   users: User[]
 }
 
@@ -148,7 +147,7 @@ export function SubscriptionSourceTable({ sources, users }: SubscriptionSourceTa
                 </TableRow>
                 {expandedItems.has(item.id) && (
                   <TableRow>
-                    <TableCell colSpan={9} className="p-0 pl-20">
+                    <TableCell colSpan={6} className="p-0">
                       <SubscriptionSourceItemTable
                         sourceId={item.id}
                         source={item}

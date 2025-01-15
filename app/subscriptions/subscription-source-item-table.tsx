@@ -42,7 +42,7 @@ interface SubscriptionSourceItemTableProps {
   users: User[]
 }
 
-export function SubscriptionSourceItemTable({ items, sourceId, source, users }: SubscriptionSourceItemTableProps) {
+export function SubscriptionSourceItemTable({ items, sourceId: _, source, users }: SubscriptionSourceItemTableProps) {
   const [editingItem, setEditingItem] = useState<SubscriptionSourceItem | null>(null)
   const [deletingItem, setDeletingItem] = useState<SubscriptionSourceItem | null>(null)
   const [isCreating, setIsCreating] = useState(false)
