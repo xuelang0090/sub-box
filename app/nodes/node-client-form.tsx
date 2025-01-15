@@ -38,7 +38,7 @@ export function NodeClientForm({ userId, nodes, users, item, onSuccess }: NodeCl
     resolver: zodResolver(formSchema),
     defaultValues: {
       userId: item?.userId ?? userId ?? "",
-      nodeId: item?.nodeId ?? "",
+      nodeId: item?.nodeId ?? (nodes.length === 1 ? nodes[0]?.id ?? "" : ""),
       url: item?.url ?? "",
       enable: item?.enable ?? true,
     },

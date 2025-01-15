@@ -1,7 +1,7 @@
 import "server-only";
 
 import crypto from "crypto";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 import { type NodeClient } from "@/types";
 import db from "../db";
@@ -51,6 +51,28 @@ class NodeClientService {
 
   async delete(id: string): Promise<void> {
     await db.delete(nodeClients).where(eq(nodeClients.id, id));
+  }
+
+  async findByNodeAndUser(nodeId: string, userId: string): Promise<NodeClient | null> {
+    const results = await db
+      .select()
+      .from(nodeClients)
+      .where(and(eq(nodeClients.nodeId, nodeId), eq(nodeClients.userId, userId)))
+      .limit(1);
+    return results[0] || null;
+  }
+
+  async createOrUpdate(
+    nodeId: string,
+    userId: string,
+    data: Omit<NodeClient, "id" | "nodeId" | "userId" | "createdAt" | "updatedAt">
+  ): Promise<NodeClient> {
+    const existing = await this.findByNodeAndUser(nodeId, userId);
+    if (existing) {
+      return this.update(existing.id, data);
+    } else {
+      return this.create({ ...data, nodeId, userId });
+    }
   }
 }
 

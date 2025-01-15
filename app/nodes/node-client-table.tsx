@@ -21,6 +21,7 @@ import { type Node, type NodeClient, type User } from "@/types";
 import { deleteNodeClient } from "./actions";
 import { createColumns } from "./node-client-columns";
 import { NodeClientForm } from "./node-client-form";
+import { BatchImportNodeClientDialog } from "./batch-import-node-client-dialog";
 
 interface NodeClientTableProps {
   userId?: string;
@@ -61,11 +62,17 @@ export function NodeClientTable({ userId, nodeId: _, node, items, nodes, users }
   return (
     <>
       <div className="py-2">
-        <div className="flex mb-2">
+        <div className="flex gap-2 mb-2">
           <Button variant="outline" size="sm" onClick={() => setIsCreating(true)}>
             <PlusCircle className="mr-2 h-4 w-4" />
             添加客户端
           </Button>
+          <BatchImportNodeClientDialog
+            userId={userId}
+            node={node}
+            nodes={nodes}
+            users={users}
+          />
         </div>
 
         <DataTable 
@@ -87,6 +94,7 @@ export function NodeClientTable({ userId, nodeId: _, node, items, nodes, users }
         <NodeClientForm
           userId={userId}
           nodes={node ? [node] : nodes}
+          users={users}
           item={editingItem ?? undefined}
           onSuccess={() => {
             setEditingItem(null);

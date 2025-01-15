@@ -52,8 +52,15 @@ export async function createNodeClient(data: Omit<NodeClient, "id" | "createdAt"
   return client;
 }
 
-export async function updateNodeClient(id: string, data: Partial<Omit<NodeClient, "id" | "createdAt" | "updatedAt">>) {
-  const client = await nodeClientService.update(id, data);
+export async function updateNodeClient(
+  nodeId: string,
+  data: Omit<NodeClient, "id" | "createdAt" | "updatedAt">
+): Promise<NodeClient> {
+  const client = await nodeClientService.createOrUpdate(nodeId, data.userId, {
+    url: data.url,
+    enable: data.enable,
+    clientId: data.clientId,
+  });
   revalidatePath("/subscriptions");
   return client;
 }
@@ -61,4 +68,18 @@ export async function updateNodeClient(id: string, data: Partial<Omit<NodeClient
 export async function deleteNodeClient(id: string) {
   await nodeClientService.delete(id);
   revalidatePath("/subscriptions");
+}
+
+export async function findNodeClientByNodeAndUser(nodeId: string, userId: string): Promise<NodeClient | null> {
+  return nodeClientService.findByNodeAndUser(nodeId, userId);
+}
+
+export async function createOrUpdateNodeClient(
+  nodeId: string,
+  userId: string,
+  data: Omit<NodeClient, "id" | "nodeId" | "userId" | "createdAt" | "updatedAt">
+): Promise<NodeClient> {
+  const client = await nodeClientService.createOrUpdate(nodeId, userId, data);
+  revalidatePath("/subscriptions");
+  return client;
 }

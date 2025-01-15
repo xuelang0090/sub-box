@@ -83,6 +83,7 @@ export function UserNodeClientTable({ userId, items, nodes }: UserNodeClientTabl
         <NodeClientForm
           userId={userId}
           nodes={nodes}
+          users={[]}
           item={editingItem ?? undefined}
           onSuccess={() => {
             setEditingItem(null);
