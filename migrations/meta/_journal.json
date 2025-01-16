@@ -15,6 +15,13 @@
       "when": 1737013871545,
       "tag": "0001_soft_captain_cross",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1737028302692,
+      "tag": "0002_marvelous_gauntlet",
+      "breakpoints": true
     }
   ]
 }

@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useTransition } from "react";
 import { Upload } from "lucide-react";
 import { toast } from "sonner";
@@ -101,7 +103,6 @@ export function BatchImportNodeClientDialog({ userId, node, nodes, users }: Batc
           await createOrUpdateNodeClient(nodeId, item.userId, {
             url: item.url,
             enable: item.enable,
-            clientId: null,
           });
         }
 

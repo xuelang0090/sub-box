@@ -7,17 +7,34 @@ import { DataTableColumnHeader } from "@/components/data-table/data-table-column
 import { DateTime } from "@/components/date-time";
 import { IdBadge } from "@/components/id-badge";
 import { Button } from "@/components/ui/button";
-import { type Node, type NodeClient } from "@/types";
+import { type Node as DbNode, type NodeClient } from "@/types";
 import { type ColumnDef } from "@tanstack/react-table";
 
 interface CreateColumnsOptions {
-  nodes: Node[];
-  onEdit: (item: NodeClient) => void;
-  onDelete: (item: NodeClient) => void;
+  userId: string;
+  nodes: DbNode[];
+  onEdit: (item: NodeClient & { users: { userId: string; enable: boolean; order: number }[] }) => void;
+  onDelete: (item: NodeClient & { users: { userId: string; enable: boolean; order: number }[] }) => void;
 }
 
-export function createColumns({ nodes, onEdit, onDelete }: CreateColumnsOptions): ColumnDef<NodeClient>[] {
+export function createColumns({ userId, nodes, onEdit, onDelete }: CreateColumnsOptions): ColumnDef<NodeClient & { users: { userId: string; enable: boolean; order: number }[] }>[] {
   return [
+    {
+      accessorKey: "users",
+      header: ({ column }) => <DataTableColumnHeader column={column} title="顺序" />,
+      cell: ({ row }) => {
+        const userOption = row.original.users.find(u => u.userId === userId);
+        return userOption?.order ?? 0;
+      },
+      meta: {
+        title: "顺序",
+      },
+      sortingFn: (rowA, rowB) => {
+        const orderA = rowA.original.users.find(u => u.userId === userId)?.order ?? 0;
+        const orderB = rowB.original.users.find(u => u.userId === userId)?.order ?? 0;
+        return orderA - orderB;
+      },
+    },
     {
       accessorKey: "id",
       header: ({ column }) => <DataTableColumnHeader column={column} title="ID" />,
@@ -46,9 +63,12 @@ export function createColumns({ nodes, onEdit, onDelete }: CreateColumnsOptions)
       },
     },
     {
-      accessorKey: "enable",
+      accessorKey: "users",
       header: ({ column }) => <DataTableColumnHeader column={column} title="状态" />,
-      cell: ({ row }) => (row.getValue("enable") ? "启用" : "禁用"),
+      cell: ({ row }) => {
+        const userOption = row.original.users.find(u => u.userId === userId);
+        return userOption?.enable ? "启用" : "禁用";
+      },
       meta: {
         title: "状态",
       },

@@ -8,12 +8,15 @@ import { DateTime } from "@/components/date-time";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { IdBadge } from "@/components/id-badge";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { type Node, type NodeClient, type User } from "@/types";
 
+type NodeClientWithUsers = NodeClient & { users: { userId: string; enable: boolean; order: number }[] };
+
 interface NodeClientActionsProps {
-  client: NodeClient;
-  onEdit: (client: NodeClient) => void;
-  onDelete: (client: NodeClient) => void;
+  client: NodeClientWithUsers;
+  onEdit: (client: NodeClientWithUsers) => void;
+  onDelete: (client: NodeClientWithUsers) => void;
 }
 
 function NodeClientActions({ client, onEdit, onDelete }: NodeClientActionsProps) {
@@ -34,11 +37,11 @@ function NodeClientActions({ client, onEdit, onDelete }: NodeClientActionsProps)
 interface CreateColumnsOptions {
   nodes: Node[];
   users: User[];
-  onEdit: (client: NodeClient) => void;
-  onDelete: (client: NodeClient) => void;
+  onEdit: (client: NodeClientWithUsers) => void;
+  onDelete: (client: NodeClientWithUsers) => void;
 }
 
-export function createColumns({ nodes: _, users, onEdit, onDelete }: CreateColumnsOptions): ColumnDef<NodeClient, unknown>[] {
+export function createColumns({ nodes: _, users, onEdit, onDelete }: CreateColumnsOptions): ColumnDef<NodeClientWithUsers>[] {
   return [
     {
       accessorKey: "id",
@@ -49,9 +52,21 @@ export function createColumns({ nodes: _, users, onEdit, onDelete }: CreateColum
       },
     },
     {
-      accessorKey: "userId",
+      accessorKey: "users",
       header: ({ column }) => <DataTableColumnHeader column={column} title="用户" />,
-      cell: ({ row }) => users.find((u) => u.id === row.original.userId)?.name || "-",
+      cell: ({ row }) => (
+        <div className="flex flex-wrap gap-1">
+          {row.original.users.map((userOption) => {
+            const user = users.find((u) => u.id === userOption.userId);
+            if (!user) return null;
+            return (
+              <Badge key={user.id} variant={userOption.enable ? "default" : "outline"}>
+                {user.name}
+              </Badge>
+            );
+          })}
+        </div>
+      ),
       meta: {
         title: "用户",
       },
@@ -62,14 +77,6 @@ export function createColumns({ nodes: _, users, onEdit, onDelete }: CreateColum
       cell: ({ row }) => <CollapseDisplay url={row.original.url} />,
       meta: {
         title: "URL",
-      },
-    },
-    {
-      accessorKey: "enable",
-      header: ({ column }) => <DataTableColumnHeader column={column} title="状态" />,
-      cell: ({ row }) => (row.original.enable ? "启用" : "禁用"),
-      meta: {
-        title: "状态",
       },
     },
     {

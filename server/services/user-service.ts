@@ -2,10 +2,11 @@ import "server-only";
 
 import crypto from "crypto";
 import { eq } from "drizzle-orm";
+import { type BatchItem } from "drizzle-orm/batch";
 
 import { type User } from "@/types";
 import { db, type Database } from "../db";
-import { users } from "../db/schema";
+import { users, userClientOptions } from "../db/schema";
 
 class UserService {
   private dbPromise: Promise<Database>;
@@ -65,7 +66,16 @@ class UserService {
 
   async delete(id: string): Promise<void> {
     const db = await this.getDb();
-    await db.delete(users).where(eq(users.id, id));
+    const batchStatements: BatchItem<"sqlite">[] = [
+      // Delete all user client options
+      db.delete(userClientOptions).where(eq(userClientOptions.userId, id)),
+      // Delete the user
+      db.delete(users).where(eq(users.id, id))
+    ];
+
+    if (batchStatements.length > 0) {
+      await db.batch(batchStatements as [BatchItem<"sqlite">, ...BatchItem<"sqlite">[]]);
+    }
   }
 
   async findBySubscriptionKey(subscriptionKey: string): Promise<User | null> {

@@ -23,7 +23,7 @@ import { UserNodeClientTable } from "./user-node-client-table";
 
 interface UserTableProps {
   users: User[];
-  clients: NodeClient[];
+  clients: (NodeClient & { users: { userId: string; enable: boolean; order: number }[] })[];
   nodes: Node[];
 }
 
@@ -52,14 +52,16 @@ export function UserTable({ users, clients: items, nodes }: UserTableProps) {
   // Group items by user id
   const itemsByUser = items.reduce(
     (acc, item) => {
-      const userId = item.userId;
-      if (!acc[userId]) {
-        acc[userId] = [];
+      for (const userOption of item.users) {
+        const userId = userOption.userId;
+        if (!acc[userId]) {
+          acc[userId] = [];
+        }
+        acc[userId].push(item);
       }
-      acc[userId].push(item);
       return acc;
     },
-    {} as Record<string, NodeClient[]>
+    {} as Record<string, typeof items[number][]>
   );
 
   const columns = createColumns({

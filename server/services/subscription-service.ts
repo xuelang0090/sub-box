@@ -2,13 +2,24 @@ import "server-only";
 
 import { type NodeClient, type Subconverter } from "@/types";
 import { subconverterService } from "./subconverter-service";
+import { nodeClientService } from "./node-client-service";
 
 class SubscriptionService {
   async generateSubscription(params: {
-    enabledClients: NodeClient[];
+    userId: string;
     subconverterId?: string | null;
   }): Promise<string> {
-    const { enabledClients, subconverterId } = params;
+    const { userId, subconverterId } = params;
+
+    // Get all node clients and their user options
+    const clients = await nodeClientService.getNodeClientsWithUsers();
+    const enabledClients = clients.filter(client => 
+      client.users.some(u => u.userId === userId && u.enable)
+    ).sort((a, b) => {
+      const aOrder = a.users.find(u => u.userId === userId)?.order ?? 0;
+      const bOrder = b.users.find(u => u.userId === userId)?.order ?? 0;
+      return aOrder - bOrder;
+    });
 
     if (enabledClients.length === 0) {
       throw new Error("No enabled nodes found");
@@ -34,7 +45,6 @@ class SubscriptionService {
 
     // Construct URLs
     const urls = enabledClients.map((client) => encodeURIComponent(client.url)).join("|");
-    // console.log(enabledClients);
     const baseUrl = `${subconverter.url}/sub?target=clash&url=${urls}`;
 
     // Add options if any

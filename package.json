@@ -27,6 +27,9 @@
     "with-local-db": "cross-env LOCAL_DB_PATH=$(find .wrangler/state/v3/d1/miniflare-D1DatabaseObject -type f -name '*.sqlite' -print -quit)"
   },
   "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
     "@hookform/resolvers": "latest",
     "@libsql/client": "^0.14.0",
     "@opennextjs/cloudflare": "^0.3.8",
@@ -66,8 +69,8 @@
     "cmdk": "1.0.4",
     "crypto": "latest",
     "date-fns": "4.1.0",
-    "drizzle-orm": "^0.38.3",
     "dotenv-cli": "^7.4.2",
+    "drizzle-orm": "^0.38.3",
     "embla-carousel-react": "8.5.1",
     "fs": "latest",
     "input-otp": "1.4.1",

@@ -23,22 +23,24 @@ import { createColumns } from "./node-client-columns";
 import { NodeClientForm } from "./node-client-form";
 import { BatchImportNodeClientDialog } from "./batch-import-node-client-dialog";
 
+type NodeClientWithUsers = NodeClient & { users: { userId: string; enable: boolean; order: number }[] };
+
 interface NodeClientTableProps {
   userId?: string;
   nodeId?: string;
   node?: Node;
-  items: NodeClient[];
+  items: NodeClientWithUsers[];
   nodes: Node[];
   users: User[];
 }
 
 export function NodeClientTable({ userId, nodeId: _, node, items, nodes, users }: NodeClientTableProps) {
-  const [editingItem, setEditingItem] = useState<NodeClient | null>(null);
-  const [deletingItem, setDeletingItem] = useState<NodeClient | null>(null);
+  const [editingItem, setEditingItem] = useState<NodeClientWithUsers | null>(null);
+  const [deletingItem, setDeletingItem] = useState<NodeClientWithUsers | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [isPending, startTransition] = useTransition();
 
-  function onDelete(item: NodeClient) {
+  function onDelete(item: NodeClientWithUsers) {
     startTransition(async () => {
       try {
         await deleteNodeClient(item.id);

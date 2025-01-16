@@ -2,10 +2,11 @@ import "server-only";
 
 import crypto from "crypto";
 import { eq } from "drizzle-orm";
+import { type BatchItem } from "drizzle-orm/batch";
 
 import { type Node } from "@/types";
 import { db, type Database } from "../db";
-import { nodes, nodeClients } from "../db/schema";
+import { nodes, nodeClients, userClientOptions } from "../db/schema";
 
 class NodeService {
   private dbPromise: Promise<Database>;
@@ -65,10 +66,24 @@ class NodeService {
 
   async delete(id: string): Promise<void> {
     const db = await this.getDb();
-    await db.batch([
+    // Get all node clients first
+    const clients = await db.select().from(nodeClients).where(eq(nodeClients.nodeId, id));
+    
+    // Delete in order: user_client_options -> node_clients -> node
+    const batchStatements: BatchItem<"sqlite">[] = [
+      // Delete all user client options for each client
+      ...clients.map(client => 
+        db.delete(userClientOptions).where(eq(userClientOptions.nodeClientId, client.id))
+      ),
+      // Delete all node clients
       db.delete(nodeClients).where(eq(nodeClients.nodeId, id)),
+      // Delete the node
       db.delete(nodes).where(eq(nodes.id, id))
-    ]);
+    ];
+
+    if (batchStatements.length > 0) {
+      await db.batch(batchStatements as [BatchItem<"sqlite">, ...BatchItem<"sqlite">[]]);
+    }
   }
 }
 

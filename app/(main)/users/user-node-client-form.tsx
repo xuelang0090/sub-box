@@ -9,38 +9,39 @@ import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { MultiSelect } from "@/components/ui/multi-select";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { type Node, type NodeClient, type User } from "@/types";
-import { createNodeClient, updateNodeClient } from "./actions";
+import { type Node, type NodeClient } from "@/types";
+import { createOrUpdateNodeClient } from "../nodes/actions";
 
 const formSchema = z.object({
-  userIds: z.array(z.string()).min(1, "至少选择一个用户"),
   nodeId: z.string().min(1, "节点不能为空"),
-  url: z.string().min(1, "URL不能为空"), // 不需要检查 url 是否是有效，因为可能有 vless:// 等格式
+  url: z.string().min(1, "URL不能为空"),
+  enable: z.boolean(),
 });
 
 type FormData = z.infer<typeof formSchema>;
 
-interface NodeClientFormProps {
-  userId?: string;
+interface UserNodeClientFormProps {
+  userId: string;
   nodes: Node[];
-  users?: User[];
   item?: NodeClient & { users: { userId: string; enable: boolean; order: number }[] };
   onSuccess?: () => void;
 }
 
-export function NodeClientForm({ userId, nodes, users, item, onSuccess }: NodeClientFormProps) {
+export function UserNodeClientForm({ userId, nodes, item, onSuccess }: UserNodeClientFormProps) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+
+  const userOption = item?.users.find(u => u.userId === userId);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      userIds: item ? item.users.map(u => u.userId) : userId ? [userId] : [],
       nodeId: item?.nodeId ?? (nodes.length === 1 ? nodes[0]?.id ?? "" : ""),
       url: item?.url ?? "",
+      enable: userOption?.enable ?? true,
     },
   });
 
@@ -71,17 +72,10 @@ export function NodeClientForm({ userId, nodes, users, item, onSuccess }: NodeCl
   function onSubmit(data: FormData) {
     startTransition(async () => {
       try {
-        const submitData = {
-          nodeId: data.nodeId,
+        await createOrUpdateNodeClient(data.nodeId, userId, {
           url: data.url,
-          userIds: data.userIds,
-        };
-
-        if (item) {
-          await updateNodeClient(item.id, submitData);
-        } else {
-          await createNodeClient(submitData);
-        }
+          enable: data.enable,
+        });
 
         toast("保存成功");
         router.refresh();
@@ -95,27 +89,6 @@ export function NodeClientForm({ userId, nodes, users, item, onSuccess }: NodeCl
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        {!userId && users && (
-          <FormField
-            control={form.control}
-            name="userIds"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>用户</FormLabel>
-                <MultiSelect
-                  value={field.value}
-                  onValueChange={field.onChange}
-                  options={users.map((user) => ({
-                    value: user.id,
-                    label: user.name,
-                  }))}
-                  placeholder="选择用户"
-                />
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        )}
         <FormField
           control={form.control}
           name="nodeId"
@@ -158,10 +131,24 @@ export function NodeClientForm({ userId, nodes, users, item, onSuccess }: NodeCl
             </FormItem>
           )}
         />
+        <FormField
+          control={form.control}
+          name="enable"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+              <div className="space-y-0.5">
+                <FormLabel className="text-base">启用</FormLabel>
+              </div>
+              <FormControl>
+                <Switch checked={field.value} onCheckedChange={field.onChange} />
+              </FormControl>
+            </FormItem>
+          )}
+        />
         <Button type="submit" disabled={isPending}>
           {isPending ? "保存中..." : "保存"}
         </Button>
       </form>
     </Form>
   );
-}
+} 

@@ -23,12 +23,13 @@ interface DataTableProps<TData extends { id: string }> {
   columns: ColumnDef<TData, unknown>[];
   data: TData[];
   expandedContent?: (item: TData) => React.ReactNode;
-  expandedTitle?: string | ((item: TData) => string);
-  defaultExpanded?: boolean;
+  expandedTitle?: (item: TData) => string;
   enableColumnVisibility?: boolean;
   enableGlobalSearch?: boolean;
-  className?: string;
   getItemCount?: (item: TData) => number;
+  defaultExpanded?: boolean;
+  defaultSorting?: SortingState;
+  className?: string;
 }
 
 export function DataTable<TData extends { id: string }>({
@@ -39,10 +40,11 @@ export function DataTable<TData extends { id: string }>({
   defaultExpanded = false,
   enableColumnVisibility = false,
   enableGlobalSearch = false,
+  defaultSorting = [],
   className,
   getItemCount,
 }: DataTableProps<TData>) {
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const [sorting, setSorting] = useState<SortingState>(defaultSorting);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [expandedRows, setExpandedRows] = useState<Set<string>>(() => {
     if (defaultExpanded) {

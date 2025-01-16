@@ -2,20 +2,23 @@ import "server-only";
 
 import { type Database } from "../db";
 import { db } from "../db";
-import { users, nodes, nodeClients, subconverters, clashConfigs } from "../db/schema";
+import { users, nodes, nodeClients, subconverters, clashConfigs, userClientOptions } from "../db/schema";
 import { type BatchItem } from "drizzle-orm/batch";
+import { and, eq } from "drizzle-orm";
 import { userService } from "./user-service";
 import { nodeService } from "./node-service";
 import { nodeClientService } from "./node-client-service";
 import { subconverterService } from "./subconverter-service";
 import { clashConfigService } from "./clash-config-service";
+import { type User, type Node, type NodeClient, type Subconverter, type ClashConfig, type UserClientOption } from "@/types";
 
 export type ExportData = {
-  users: Awaited<ReturnType<typeof userService.getAll>>;
-  nodes: Awaited<ReturnType<typeof nodeService.getAll>>;
-  nodeClients: Awaited<ReturnType<typeof nodeClientService.getAll>>;
-  subconverters: Awaited<ReturnType<typeof subconverterService.getAll>>;
-  clashConfigs: Awaited<ReturnType<typeof clashConfigService.getAll>>;
+  users: User[];
+  nodes: Node[];
+  nodeClients: NodeClient[];
+  userClientOptions: UserClientOption[];
+  subconverters: Subconverter[];
+  clashConfigs: ClashConfig[];
 };
 
 export type ImportOptions = {
@@ -34,10 +37,12 @@ class ExportService {
   }
 
   async exportAll(): Promise<ExportData> {
-    const [usersData, nodesData, nodeClientsData, subconvertersData, clashConfigsData] = await Promise.all([
+    const db = await this.getDb();
+    const [usersData, nodesData, nodeClientsData, userClientOptionsData, subconvertersData, clashConfigsData] = await Promise.all([
       userService.getAll(),
       nodeService.getAll(),
       nodeClientService.getAll(),
+      db.select().from(userClientOptions),
       subconverterService.getAll(),
       clashConfigService.getAll(),
     ]);
@@ -46,6 +51,7 @@ class ExportService {
       users: usersData,
       nodes: nodesData,
       nodeClients: nodeClientsData,
+      userClientOptions: userClientOptionsData,
       subconverters: subconvertersData,
       clashConfigs: clashConfigsData,
     };
@@ -94,6 +100,21 @@ class ExportService {
         if (existing) continue;
       }
       batchStatements.push(db.insert(nodeClients).values(client));
+    }
+
+    for (const option of data.userClientOptions) {
+      if (options.skipExisting) {
+        // 对于关联表，我们需要检查组合键
+        const existingOptions = await db
+          .select()
+          .from(userClientOptions)
+          .where(and(
+            eq(userClientOptions.userId, option.userId),
+            eq(userClientOptions.nodeClientId, option.nodeClientId)
+          ));
+        if (existingOptions.length > 0) continue;
+      }
+      batchStatements.push(db.insert(userClientOptions).values(option));
     }
 
     // 执行批处理
