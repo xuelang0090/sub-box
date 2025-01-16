@@ -3,6 +3,7 @@ import "server-only";
 import { type Database } from "../db";
 import { db } from "../db";
 import { users, nodes, nodeClients, subconverters, clashConfigs } from "../db/schema";
+import { type BatchItem } from "drizzle-orm/batch";
 import { userService } from "./user-service";
 import { nodeService } from "./node-service";
 import { nodeClientService } from "./node-client-service";
@@ -52,7 +53,7 @@ class ExportService {
 
   async importAll(data: ExportData, options: ImportOptions): Promise<void> {
     const db = await this.getDb();
-    const batchStatements: any[] = [];
+    const batchStatements: BatchItem<"sqlite">[] = [];
 
     // 收集所有导入语句
     for (const subconverter of data.subconverters) {
@@ -97,8 +98,7 @@ class ExportService {
 
     // 执行批处理
     if (batchStatements.length > 0) {
-      // 由于 D1 的限制，我们需要确保至少有一个语句
-      await db.batch(batchStatements as [any, ...any[]]);
+      await db.batch(batchStatements as [BatchItem<"sqlite">, ...BatchItem<"sqlite">[]]);
     }
   }
 }
