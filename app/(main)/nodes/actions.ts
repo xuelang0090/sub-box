@@ -20,7 +20,7 @@ export async function getNodes() {
       acc[nodeId].push(client);
       return acc;
     },
-    {} as Record<string, typeof clients[number][]>
+    {} as Record<string, (NodeClient & { users: { userId: string; enable: boolean; order: number }[] })[]>
   );
 
   return nodes.map((node) => ({

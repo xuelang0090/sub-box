@@ -17,6 +17,7 @@
     "dev": "bun with-env next dev",
     "build": "bun with-env next build",
     "lint": "bun with-env next lint",
+    "tc": "bun with-env tsc",
     "dev:worker": "wrangler dev",
     "build:worker": "bun with-env opennextjs-cloudflare",
     "preview": "bun build:worker && wrangler dev",

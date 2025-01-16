@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { type Node, type NodeClient } from "@/types";
 
 interface NodeWithItems extends Node {
-  items: NodeClient[];
+  items: (NodeClient & { users: { userId: string; enable: boolean; order: number }[] })[];
 }
 
 interface NodeActionsProps {

@@ -22,7 +22,7 @@ function getClientIP(headersList: Headers): string {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { username, password } = body
+    const { username, password } = body as { username: string; password: string }
     const headersList = headers()
     const clientIP = getClientIP(headersList)
 

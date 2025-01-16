@@ -179,6 +179,30 @@ class NodeClientService {
         .sort((a, b) => a.order - b.order),
     }));
   }
+
+  async getByUserId(userId: string): Promise<(NodeClient & { enable: boolean; order: number })[]> {
+    const db = await this.getDb();
+    const options = await db
+      .select()
+      .from(userClientOptions)
+      .where(eq(userClientOptions.userId, userId))
+      .orderBy(userClientOptions.order);
+
+    const clientIds = options.map(opt => opt.nodeClientId);
+    const clients = await db
+      .select()
+      .from(nodeClients)
+      .where(inArray(nodeClients.id, clientIds));
+
+    return clients.map(client => {
+      const option = options.find(opt => opt.nodeClientId === client.id);
+      return {
+        ...client,
+        enable: option?.enable ?? false,
+        order: option?.order ?? 0,
+      };
+    });
+  }
 }
 
 export const nodeClientService = new NodeClientService();

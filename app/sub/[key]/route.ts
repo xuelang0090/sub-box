@@ -2,9 +2,7 @@ import { NextResponse } from "next/server";
 
 import { subscriptionService } from "@/server/services/subscription-service";
 import { userService } from "@/server/services/user-service";
-import { nodeClientService } from "@/server/services/node-client-service";
 import { clashConfigService } from "@/server/services/clash-config-service";
-import { type NodeClient } from "@/types";
 
 export async function GET(request: Request, { params }: { params: { key: string } }) {
   try {
@@ -22,18 +20,13 @@ export async function GET(request: Request, { params }: { params: { key: string 
       );
     }
 
-    // 2. 获取用户的所有已启用节点
-    const allClients = await nodeClientService.getByUserId(user.id);
-    
-    const enabledClients = allClients.filter((client: NodeClient) => client.enable);
-
-    // 3. 生成订阅内容
+    // 2. 生成订阅内容
     const originalYaml = await subscriptionService.generateSubscription({
-      enabledClients,
+      userId: user.id,
       subconverterId: user.subconverterId,
     });
 
-    // 4. 检查是否需要合并配置
+    // 3. 检查是否需要合并配置
     const url = new URL(request.url);
     const configKey = url.searchParams.get("config");
     let finalYaml = originalYaml;
@@ -46,7 +39,7 @@ export async function GET(request: Request, { params }: { params: { key: string 
       }
     }
 
-    // 5. 返回最终的 YAML
+    // 4. 返回最终的 YAML
     return new NextResponse(finalYaml, {
       headers: {
         "Content-Type": "text/yaml; charset=utf-8",

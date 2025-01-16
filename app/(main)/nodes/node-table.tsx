@@ -22,7 +22,7 @@ import { NodeForm } from "./node-form";
 import { NodeClientTable } from "./node-client-table";
 
 interface NodeWithItems extends Node {
-  items: NodeClient[];
+  items: (NodeClient & { users: { userId: string; enable: boolean; order: number }[] })[];
 }
 
 interface NodeTableProps {
@@ -50,8 +50,8 @@ export function NodeTable({ nodes, users }: NodeTableProps) {
   }
 
   const columns = createColumns({
-    onEdit: setEditingItem,
-    onDelete: setDeletingItem,
+    onEdit: (node: NodeWithItems) => setEditingItem(node),
+    onDelete: (node: NodeWithItems) => setDeletingItem(node),
   });
 
   return (

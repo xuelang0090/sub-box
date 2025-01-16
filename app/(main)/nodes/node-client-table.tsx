@@ -29,12 +29,12 @@ interface NodeClientTableProps {
   userId?: string;
   nodeId?: string;
   node?: Node;
-  items: NodeClientWithUsers[];
   nodes: Node[];
+  items: NodeClientWithUsers[];
   users: User[];
 }
 
-export function NodeClientTable({ userId, nodeId: _, node, items, nodes, users }: NodeClientTableProps) {
+export function NodeClientTable({ userId, nodeId: _, node, nodes, items, users }: NodeClientTableProps) {
   const [editingItem, setEditingItem] = useState<NodeClientWithUsers | null>(null);
   const [deletingItem, setDeletingItem] = useState<NodeClientWithUsers | null>(null);
   const [isCreating, setIsCreating] = useState(false);

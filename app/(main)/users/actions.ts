@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { nodeClientService } from "@/server/services/node-client-service";
 import { nodeService } from "@/server/services/node-service";
 import { userService } from "@/server/services/user-service";
-import { type User } from "@/types";
+import { type User, type Subconverter } from "@/types";
 
 export async function getUsers() {
   return userService.getAll();
@@ -47,4 +47,12 @@ export async function updateUserClientOption(
   await nodeClientService.updateUserClientOption(nodeClientId, userId, data);
   revalidatePath("/nodes");
   revalidatePath("/users");
+}
+
+export async function getSubconverters() {
+  const response = await fetch("/api/subconverters");
+  if (!response.ok) {
+    throw new Error("Failed to fetch subconverters");
+  }
+  return response.json() as Promise<Subconverter[]>;
 }
