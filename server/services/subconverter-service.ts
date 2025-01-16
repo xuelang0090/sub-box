@@ -6,6 +6,7 @@ import { eq } from "drizzle-orm";
 import { type Subconverter, type SubconverterRow } from "@/types";
 import { db, type Database } from "../db";
 import { subconverters } from "../db/schema";
+import { users } from "../db/schema";
 
 function rowToSubconverter(row: SubconverterRow): Subconverter {
   return {
@@ -73,7 +74,12 @@ class SubconverterService {
 
   async delete(id: string): Promise<void> {
     const db = await this.getDb();
-    await db.delete(subconverters).where(eq(subconverters.id, id));
+    await db.batch([
+      // Set subconverterId to null for all users using this subconverter
+      db.update(users).set({ subconverterId: null }).where(eq(users.subconverterId, id)),
+      // Delete the subconverter
+      db.delete(subconverters).where(eq(subconverters.id, id))
+    ]);
   }
 }
 

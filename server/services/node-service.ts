@@ -5,7 +5,7 @@ import { eq } from "drizzle-orm";
 
 import { type Node } from "@/types";
 import { db, type Database } from "../db";
-import { nodes } from "../db/schema";
+import { nodes, nodeClients } from "../db/schema";
 
 class NodeService {
   private dbPromise: Promise<Database>;
@@ -65,7 +65,10 @@ class NodeService {
 
   async delete(id: string): Promise<void> {
     const db = await this.getDb();
-    await db.delete(nodes).where(eq(nodes.id, id));
+    await db.batch([
+      db.delete(nodeClients).where(eq(nodeClients.nodeId, id)),
+      db.delete(nodes).where(eq(nodes.id, id))
+    ]);
   }
 }
 
