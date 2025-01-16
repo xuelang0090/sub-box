@@ -95,3 +95,6 @@ database_id = "6d5afde0-0b33-41bf-959d-0a0086762040" # wrangler d1 info <YOUR_DA
 # [[env.production.kv_namespaces]]
 # binding = "MY_KV_NAMESPACE"
 # id = "<PRODUCTION_NAMESPACE_ID>"
+
+[observability.logs]
+enabled = true
