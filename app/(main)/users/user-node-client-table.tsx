@@ -68,11 +68,21 @@ export function UserNodeClientTable({ userId, items, nodes }: UserNodeClientTabl
 
         <DataTable 
           columns={columns} 
-          data={items.sort((a, b) => {
-            const aUser = a.users.find(u => u.userId === userId);
-            const bUser = b.users.find(u => u.userId === userId);
-            return (aUser?.order ?? 0) - (bUser?.order ?? 0);
-          })}
+          data={items
+            .sort((a, b) => {
+              const aUser = a.users.find(u => u.userId === userId);
+              const bUser = b.users.find(u => u.userId === userId);
+              return (aUser?.order ?? 0) - (bUser?.order ?? 0);
+            })
+            // Map the items to include a virtual order for display
+            .map((item, index) => ({
+              ...item,
+              users: item.users.map(u => 
+                u.userId === userId 
+                  ? { ...u, virtualOrder: index } 
+                  : u
+              )
+            }))}
           defaultSorting={[]}
         />
       </div>

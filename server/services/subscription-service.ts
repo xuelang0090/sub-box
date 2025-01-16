@@ -1,6 +1,6 @@
 import "server-only";
 
-import { type NodeClient, type Subconverter } from "@/types";
+import { type Subconverter } from "@/types";
 import { subconverterService } from "./subconverter-service";
 import { nodeClientService } from "./node-client-service";
 
@@ -13,13 +13,15 @@ class SubscriptionService {
 
     // Get all node clients and their user options
     const clients = await nodeClientService.getNodeClientsWithUsers();
-    const enabledClients = clients.filter(client => 
-      client.users.some(u => u.userId === userId && u.enable)
-    ).sort((a, b) => {
-      const aOrder = a.users.find(u => u.userId === userId)?.order ?? 0;
-      const bOrder = b.users.find(u => u.userId === userId)?.order ?? 0;
-      return aOrder - bOrder;
-    });
+    // Filter enabled clients for the user and sort by order
+    const enabledClients = clients
+      .filter(client => client.users.some(u => u.userId === userId && u.enable))
+      .sort((a, b) => {
+        // Get the order value for current user, default to 0 if not found
+        const aOrder = a.users.find(u => u.userId === userId)?.order ?? 0;
+        const bOrder = b.users.find(u => u.userId === userId)?.order ?? 0;
+        return aOrder - bOrder;
+      });
 
     if (enabledClients.length === 0) {
       throw new Error("No enabled nodes found");

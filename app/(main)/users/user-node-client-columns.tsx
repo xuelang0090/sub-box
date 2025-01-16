@@ -13,18 +13,18 @@ import { type ColumnDef } from "@tanstack/react-table";
 interface CreateColumnsOptions {
   userId: string;
   nodes: DbNode[];
-  onEdit: (item: NodeClient & { users: { userId: string; enable: boolean; order: number }[] }) => void;
-  onDelete: (item: NodeClient & { users: { userId: string; enable: boolean; order: number }[] }) => void;
+  onEdit: (item: NodeClient & { users: { userId: string; enable: boolean; order: number; virtualOrder?: number }[] }) => void;
+  onDelete: (item: NodeClient & { users: { userId: string; enable: boolean; order: number; virtualOrder?: number }[] }) => void;
 }
 
-export function createColumns({ userId, nodes, onEdit, onDelete }: CreateColumnsOptions): ColumnDef<NodeClient & { users: { userId: string; enable: boolean; order: number }[] }>[] {
+export function createColumns({ userId, nodes, onEdit, onDelete }: CreateColumnsOptions): ColumnDef<NodeClient & { users: { userId: string; enable: boolean; order: number; virtualOrder?: number }[] }>[] {
   return [
     {
       accessorKey: "users",
       header: ({ column }) => <DataTableColumnHeader column={column} title="顺序" />,
       cell: ({ row }) => {
         const userOption = row.original.users.find(u => u.userId === userId);
-        return userOption?.order ?? 0;
+        return userOption?.virtualOrder ?? 0;
       },
       meta: {
         title: "顺序",
