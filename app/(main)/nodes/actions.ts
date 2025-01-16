@@ -53,14 +53,10 @@ export async function createNodeClient(data: Omit<NodeClient, "id" | "createdAt"
 }
 
 export async function updateNodeClient(
-  nodeId: string,
+  id: string,
   data: Omit<NodeClient, "id" | "createdAt" | "updatedAt">
 ): Promise<NodeClient> {
-  const client = await nodeClientService.createOrUpdate(nodeId, data.userId, {
-    url: data.url,
-    enable: data.enable,
-    clientId: data.clientId,
-  });
+  const client = await nodeClientService.update(id, data);
   revalidatePath("/subscriptions");
   return client;
 }

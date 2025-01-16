@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -33,6 +34,7 @@ interface NodeClientFormProps {
 
 export function NodeClientForm({ userId, nodes, users, item, onSuccess }: NodeClientFormProps) {
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -82,7 +84,7 @@ export function NodeClientForm({ userId, nodes, users, item, onSuccess }: NodeCl
         }
 
         toast("保存成功");
-
+        router.refresh();
         onSuccess?.();
       } catch (error) {
         toast.error((error as Error).message);
