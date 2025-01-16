@@ -72,9 +72,12 @@ export function UserNodeClientForm({ userId, nodes, item, onSuccess }: UserNodeC
   function onSubmit(data: FormData) {
     startTransition(async () => {
       try {
-        await createOrUpdateNodeClient(data.nodeId, userId, {
+        await createOrUpdateNodeClient(data.nodeId, {
           url: data.url,
-          enable: data.enable,
+          userOptions: [{
+            userId,
+            enable: data.enable
+          }]
         });
 
         toast("保存成功");

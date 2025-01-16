@@ -62,6 +62,7 @@ export function createColumns({ nodes: _, users, onEdit, onDelete }: CreateColum
             return (
               <Badge key={user.id} variant={userOption.enable ? "default" : "outline"}>
                 {user.name}
+                {!userOption.enable && <span className="ml-1">(已禁用)</span>}
               </Badge>
             );
           })}

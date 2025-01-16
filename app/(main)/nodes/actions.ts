@@ -49,13 +49,21 @@ export async function deleteNode(id: string) {
 export async function createNodeClient(data: {
   nodeId: string;
   url: string;
-  userIds: string[];
+  userOptions: {
+    userId: string;
+    enable: boolean;
+  }[];
 }): Promise<NodeClient> {
   const client = await nodeClientService.create({
     nodeId: data.nodeId,
     url: data.url,
   });
-  await nodeClientService.setUserClientOptions(client.id, data.userIds);
+  const userIds = data.userOptions.map(opt => opt.userId);
+  if (userIds.length > 0) {
+    await nodeClientService.setUserClientOptions(client.id, userIds, {
+      enable: data.userOptions[0]?.enable ?? true
+    });
+  }
   revalidatePath("/nodes");
   return client;
 }
@@ -65,14 +73,22 @@ export async function updateNodeClient(
   data: {
     nodeId: string;
     url: string;
-    userIds: string[];
+    userOptions: {
+      userId: string;
+      enable: boolean;
+    }[];
   }
 ): Promise<NodeClient> {
   const client = await nodeClientService.update(id, {
     nodeId: data.nodeId,
     url: data.url,
   });
-  await nodeClientService.setUserClientOptions(client.id, data.userIds);
+  const userIds = data.userOptions.map(opt => opt.userId);
+  if (userIds.length > 0) {
+    await nodeClientService.setUserClientOptions(client.id, userIds, {
+      enable: data.userOptions[0]?.enable ?? true
+    });
+  }
   revalidatePath("/nodes");
   return client;
 }
@@ -92,20 +108,21 @@ export async function findNodeClientByNodeAndUser(nodeId: string, userId: string
 
 export async function createOrUpdateNodeClient(
   nodeId: string,
-  userId: string,
   data: {
     url: string;
-    enable: boolean;
+    userOptions: {
+      userId: string;
+      enable: boolean;
+    }[];
   }
 ): Promise<NodeClient> {
-  const existing = await findNodeClientByNodeAndUser(nodeId, userId);
-  if (existing) {
-    await nodeClientService.update(existing.id, { url: data.url });
-    await nodeClientService.updateUserClientOption(existing.id, userId, { enable: data.enable });
-    return existing;
-  } else {
-    const client = await nodeClientService.create({ nodeId, url: data.url });
-    await nodeClientService.setUserClientOptions(client.id, [userId], { enable: data.enable });
-    return client;
+  const userIds = data.userOptions.map(opt => opt.userId);
+  const client = await nodeClientService.create({ nodeId, url: data.url });
+  if (userIds.length > 0) {
+    await nodeClientService.setUserClientOptions(client.id, userIds, { 
+      enable: data.userOptions[0]?.enable ?? true 
+    });
   }
+  revalidatePath("/nodes");
+  return client;
 }

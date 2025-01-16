@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -19,6 +20,10 @@ const formSchema = z.object({
   userIds: z.array(z.string()).min(1, "至少选择一个用户"),
   nodeId: z.string().min(1, "节点不能为空"),
   url: z.string().min(1, "URL不能为空"), // 不需要检查 url 是否是有效，因为可能有 vless:// 等格式
+  userOptions: z.array(z.object({
+    userId: z.string(),
+    enable: z.boolean(),
+  })),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -41,8 +46,20 @@ export function NodeClientForm({ userId, nodes, users, item, onSuccess }: NodeCl
       userIds: item ? item.users.map(u => u.userId) : userId ? [userId] : [],
       nodeId: item?.nodeId ?? (nodes.length === 1 ? nodes[0]?.id ?? "" : ""),
       url: item?.url ?? "",
+      userOptions: item ? item.users : userId ? [{ userId, enable: true }] : [],
     },
   });
+
+  // Watch userIds to sync with userOptions
+  const watchedUserIds = form.watch("userIds");
+  useEffect(() => {
+    const currentOptions = form.getValues("userOptions");
+    const newOptions = watchedUserIds.map(userId => {
+      const existing = currentOptions.find(opt => opt.userId === userId);
+      return existing || { userId, enable: true };
+    });
+    form.setValue("userOptions", newOptions);
+  }, [watchedUserIds, form]);
 
   const selectedNode = nodes.find((n) => n.id === form.watch("nodeId"));
 
@@ -74,7 +91,7 @@ export function NodeClientForm({ userId, nodes, users, item, onSuccess }: NodeCl
         const submitData = {
           nodeId: data.nodeId,
           url: data.url,
-          userIds: data.userIds,
+          userOptions: data.userOptions,
         };
 
         if (item) {

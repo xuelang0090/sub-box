@@ -100,9 +100,12 @@ export function BatchImportNodeClientDialog({ userId, node, nodes, users }: Batc
         }
 
         for (const item of items) {
-          await createOrUpdateNodeClient(nodeId, item.userId, {
+          await createOrUpdateNodeClient(nodeId, {
             url: item.url,
-            enable: item.enable,
+            userOptions: [{
+              userId: item.userId,
+              enable: item.enable
+            }]
           });
         }
 
