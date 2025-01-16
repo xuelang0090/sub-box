@@ -6,9 +6,19 @@ import { clashConfigService } from "@/server/services/clash-config-service";
 import { subconverterService } from "@/server/services/subconverter-service";
 import { userService } from "@/server/services/user-service";
 import type { User } from "@/types";
+import { nodeService } from "@/server/services/node-service";
+import { nodeClientService } from "@/server/services/node-client-service";
 
 export async function getUsers() {
   return userService.getAll();
+}
+
+export async function getNodes() {
+  return nodeService.getAll();
+}
+
+export async function getClients() {
+  return nodeClientService.getAll();
 }
 
 export async function getSubconverters() {

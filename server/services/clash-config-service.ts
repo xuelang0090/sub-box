@@ -89,7 +89,6 @@ class ClashConfigService {
       for (const key in globalConfig) {
         orderedConfig[key] = globalConfig[key];
       }
-      console.log("orderedConfig", Object.keys(orderedConfig).length);
       
       // Then, add remaining keys from finalConfig that don't exist in globalConfig
       for (const key in finalConfig) {
@@ -97,7 +96,7 @@ class ClashConfigService {
           orderedConfig[key] = finalConfig[key];
         }
       }
-      console.log("orderedConfig", Object.keys(orderedConfig).length);
+      
       finalConfig = orderedConfig;
     }
 

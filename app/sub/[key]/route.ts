@@ -25,6 +25,7 @@ export async function GET(_request: Request, { params }: { params: { key: string
 
     // 2. 获取用户的所有已启用节点
     const allClients = await nodeClientService.getByUserId(user.id);
+    
     const enabledClients = allClients.filter((client: NodeClient) => client.enable);
 
     // 3. 生成订阅内容

@@ -23,12 +23,12 @@ import { UserNodeClientTable } from "./user-node-client-table";
 
 interface UserTableProps {
   users: User[];
-  items: NodeClient[];
+  clients: NodeClient[];
   nodes: Node[];
   clashConfigs: ClashConfig[];
 }
 
-export function UserTable({ users, items, nodes, clashConfigs }: UserTableProps) {
+export function UserTable({ users, clients: items, nodes, clashConfigs }: UserTableProps) {
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [deletingUser, setDeletingUser] = useState<User | null>(null);
   const [baseUrl, setBaseUrl] = useState("");

@@ -52,54 +52,54 @@ class ExportService {
 
   async importAll(data: ExportData, options: ImportOptions): Promise<void> {
     const db = await this.getDb();
+    const batchStatements: any[] = [];
 
-    // 开始导入
-    await db.transaction(async (tx) => {
-      // 导入 subconverters
-      for (const subconverter of data.subconverters) {
-        if (options.skipExisting) {
-          const existing = await subconverterService.get(subconverter.id);
-          if (existing) continue;
-        }
-        await tx.insert(subconverters).values(subconverter);
+    // 收集所有导入语句
+    for (const subconverter of data.subconverters) {
+      if (options.skipExisting) {
+        const existing = await subconverterService.get(subconverter.id);
+        if (existing) continue;
       }
+      batchStatements.push(db.insert(subconverters).values(subconverter));
+    }
 
-      // 导入 clash configs
-      for (const config of data.clashConfigs) {
-        if (options.skipExisting) {
-          const existing = await clashConfigService.get(config.id);
-          if (existing) continue;
-        }
-        await tx.insert(clashConfigs).values(config);
+    for (const config of data.clashConfigs) {
+      if (options.skipExisting) {
+        const existing = await clashConfigService.get(config.id);
+        if (existing) continue;
       }
+      batchStatements.push(db.insert(clashConfigs).values(config));
+    }
 
-      // 导入 nodes
-      for (const node of data.nodes) {
-        if (options.skipExisting) {
-          const existing = await nodeService.get(node.id);
-          if (existing) continue;
-        }
-        await tx.insert(nodes).values(node);
+    for (const node of data.nodes) {
+      if (options.skipExisting) {
+        const existing = await nodeService.get(node.id);
+        if (existing) continue;
       }
+      batchStatements.push(db.insert(nodes).values(node));
+    }
 
-      // 导入 users
-      for (const user of data.users) {
-        if (options.skipExisting) {
-          const existing = await userService.get(user.id);
-          if (existing) continue;
-        }
-        await tx.insert(users).values(user);
+    for (const user of data.users) {
+      if (options.skipExisting) {
+        const existing = await userService.get(user.id);
+        if (existing) continue;
       }
+      batchStatements.push(db.insert(users).values(user));
+    }
 
-      // 导入 node clients
-      for (const client of data.nodeClients) {
-        if (options.skipExisting) {
-          const existing = await nodeClientService.get(client.id);
-          if (existing) continue;
-        }
-        await tx.insert(nodeClients).values(client);
+    for (const client of data.nodeClients) {
+      if (options.skipExisting) {
+        const existing = await nodeClientService.get(client.id);
+        if (existing) continue;
       }
-    });
+      batchStatements.push(db.insert(nodeClients).values(client));
+    }
+
+    // 执行批处理
+    if (batchStatements.length > 0) {
+      // 由于 D1 的限制，我们需要确保至少有一个语句
+      await db.batch(batchStatements as [any, ...any[]]);
+    }
   }
 }
 

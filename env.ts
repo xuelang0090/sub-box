@@ -15,6 +15,7 @@ export const env = createEnv({
     CLOUDFLARE_ACCOUNT_ID: z.string().optional(),
     CLOUDFLARE_D1_DATABASE_ID: z.string().optional(),
     CLOUDFLARE_TOKEN: z.string().optional(),
+    DEPLOY_TARGET: z.enum(["cloudflare", "docker"]),
 
     ADMIN_USERNAME: z.string(),
     ADMIN_PASSWORD: z.string(),
@@ -44,7 +45,7 @@ export const env = createEnv({
     CLOUDFLARE_ACCOUNT_ID: process.env.CLOUDFLARE_ACCOUNT_ID,
     CLOUDFLARE_D1_DATABASE_ID: process.env.CLOUDFLARE_D1_DATABASE_ID,
     CLOUDFLARE_TOKEN: process.env.CLOUDFLARE_TOKEN,
-    
+    DEPLOY_TARGET: process.env.DEPLOY_TARGET,
     ADMIN_USERNAME: process.env.ADMIN_USERNAME,
     ADMIN_PASSWORD: process.env.ADMIN_PASSWORD,
     JWT_SECRET: process.env.JWT_SECRET,

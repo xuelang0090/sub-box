@@ -34,6 +34,7 @@ class SubscriptionService {
 
     // Construct URLs
     const urls = enabledClients.map((client) => encodeURIComponent(client.url)).join("|");
+    // console.log(enabledClients);
     const baseUrl = `${subconverter.url}/sub?target=clash&url=${urls}`;
 
     // Add options if any

@@ -28,6 +28,7 @@ ADMIN_PASSWORD = "your-secure-password"
 JWT_SECRET = "your-secret-key-should-be-very-long-and-random"
 SESSION_TAG = "0"
 SESSION_DURATION = "7d"
+DEPLOY_TARGET = "cloudflare"
 
 # Bind the Workers AI model catalog. Run machine learning models, powered by serverless GPUs, on Cloudflare’s global network
 # Docs: https://developers.cloudflare.com/pages/functions/bindings/#workers-ai
