@@ -10,8 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { type ClashConfig, type Subconverter, type User } from "@/types";
-import { createUser, getClashConfigs, getSubconverters, updateUser } from "./actions";
+import { type Subconverter, type User } from "@/types";
+import { createUser, getSubconverters, updateUser } from "./actions";
 
 const formSchema = z.object({
   name: z.string().min(1, "名称不能为空"),
@@ -20,7 +20,6 @@ const formSchema = z.object({
     .min(6, "订阅密钥至少需要6位")
     .regex(/^[a-zA-Z0-9]+$/, "订阅密钥只能包含字母和数字"),
   subconverterId: z.string().nullable(),
-  mergeConfigId: z.string().nullable(),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -33,7 +32,6 @@ interface UserFormProps {
 export function UserForm({ user, onSuccess }: UserFormProps) {
   const [isPending, startTransition] = useTransition();
   const [subconverters, setSubconverters] = useState<Subconverter[]>([]);
-  const [clashConfigs, setClashConfigs] = useState<ClashConfig[]>([]);
 
   function generateSubscriptionKey() {
     // 生成包含数字、小写字母和大写字母的8位密钥
@@ -64,9 +62,8 @@ export function UserForm({ user, onSuccess }: UserFormProps) {
 
   useEffect(() => {
     const loadData = async () => {
-      const [subconvertersData, clashConfigsData] = await Promise.all([getSubconverters(), getClashConfigs()]);
+      const subconvertersData = await getSubconverters();
       setSubconverters(subconvertersData);
-      setClashConfigs(clashConfigsData);
     };
     loadData();
   }, []);
@@ -99,7 +96,6 @@ export function UserForm({ user, onSuccess }: UserFormProps) {
             .join("");
         })(),
       subconverterId: user?.subconverterId ?? null,
-      mergeConfigId: user?.mergeConfigId ?? null,
     },
   });
 
@@ -110,7 +106,6 @@ export function UserForm({ user, onSuccess }: UserFormProps) {
           ...data,
           subscriptionKey: data.subscriptionKey,
           subconverterId: data.subconverterId || null,
-          mergeConfigId: data.mergeConfigId || null,
         };
         if (user) {
           await updateUser(user.id, submitData);
@@ -180,33 +175,6 @@ export function UserForm({ user, onSuccess }: UserFormProps) {
                   {subconverters.map((item) => (
                     <SelectItem key={item.id} value={item.id}>
                       {item.url}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="mergeConfigId"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Clash 配置</FormLabel>
-              <Select value={field.value || "none"} onValueChange={(value) => field.onChange(value === "none" ? null : value)}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="选择 Clash 配置" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem key="none" value="none">
-                    无
-                  </SelectItem>
-                  {clashConfigs.map((item) => (
-                    <SelectItem key={item.id} value={item.id}>
-                      {item.name}
                     </SelectItem>
                   ))}
                 </SelectContent>

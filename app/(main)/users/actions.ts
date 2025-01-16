@@ -2,9 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 
-import { clashConfigService } from "@/server/services/clash-config-service";
-import { subconverterService } from "@/server/services/subconverter-service";
 import { userService } from "@/server/services/user-service";
+import { subconverterService } from "@/server/services/subconverter-service";
 import type { User } from "@/types";
 import { nodeService } from "@/server/services/node-service";
 import { nodeClientService } from "@/server/services/node-client-service";
@@ -25,17 +24,13 @@ export async function getSubconverters() {
   return subconverterService.getAll();
 }
 
-export async function getClashConfigs() {
-  return clashConfigService.getAll();
-}
-
 export async function createUser(data: Omit<User, "id" | "createdAt" | "updatedAt">) {
   const user = await userService.create(data);
   revalidatePath("/users");
   return user;
 }
 
-export async function updateUser(id: string, data: Partial<Omit<User, "id" | "createdAt" | "updatedAt">>) {
+export async function updateUser(id: string, data: Omit<User, "id" | "createdAt" | "updatedAt">) {
   const user = await userService.update(id, data);
   revalidatePath("/users");
   return user;

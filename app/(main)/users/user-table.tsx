@@ -15,7 +15,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { type Node, type NodeClient, type User, type ClashConfig } from "@/types";
+import { type Node, type NodeClient, type User } from "@/types";
 import { deleteUser } from "./actions";
 import { createColumns } from "./columns";
 import { UserForm } from "./user-form";
@@ -25,10 +25,9 @@ interface UserTableProps {
   users: User[];
   clients: NodeClient[];
   nodes: Node[];
-  clashConfigs: ClashConfig[];
 }
 
-export function UserTable({ users, clients: items, nodes, clashConfigs }: UserTableProps) {
+export function UserTable({ users, clients: items, nodes }: UserTableProps) {
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [deletingUser, setDeletingUser] = useState<User | null>(null);
   const [baseUrl, setBaseUrl] = useState("");
@@ -66,8 +65,7 @@ export function UserTable({ users, clients: items, nodes, clashConfigs }: UserTa
   const columns = createColumns({
     baseUrl,
     onEdit: setEditingUser,
-    onDelete: setDeletingUser,
-    clashConfigs,
+    onDelete: setDeletingUser
   });
 
   return (

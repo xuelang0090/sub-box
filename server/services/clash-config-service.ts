@@ -7,7 +7,6 @@ import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
 import { type ClashConfig } from "@/types";
 import { db, type Database } from "../db";
 import { clashConfigs } from "../db/schema";
-import { users } from "../db/schema";
 
 // Define type for Clash configuration object
 type ClashYamlConfig = {
@@ -73,12 +72,7 @@ class ClashConfigService {
 
   async delete(id: string): Promise<void> {
     const db = await this.getDb();
-    await db.batch([
-      // Set mergeConfigId to null for all users using this config
-      db.update(users).set({ mergeConfigId: null }).where(eq(users.mergeConfigId, id)),
-      // Delete the config
-      db.delete(clashConfigs).where(eq(clashConfigs.id, id))
-    ]);
+    await db.delete(clashConfigs).where(eq(clashConfigs.id, id));
   }
 
   async mergeConfig(baseYaml: string, config: ClashConfig): Promise<string> {

@@ -1,13 +1,12 @@
 import { NextResponse } from "next/server";
-import { eq } from "drizzle-orm";
 
-import { clashConfigService } from "@/server/services/clash-config-service";
 import { subscriptionService } from "@/server/services/subscription-service";
 import { userService } from "@/server/services/user-service";
 import { nodeClientService } from "@/server/services/node-client-service";
+import { clashConfigService } from "@/server/services/clash-config-service";
 import { type NodeClient } from "@/types";
 
-export async function GET(_request: Request, { params }: { params: { key: string } }) {
+export async function GET(request: Request, { params }: { params: { key: string } }) {
   try {
     // 1. 查找用户
     const user = await userService.findBySubscriptionKey(params.key);
@@ -34,15 +33,20 @@ export async function GET(_request: Request, { params }: { params: { key: string
       subconverterId: user.subconverterId,
     });
 
-    // 4. 查找对应的 Clash 配置
-    const config = user.mergeConfigId ? await clashConfigService.get(user.mergeConfigId) : null;
+    // 4. 检查是否需要合并配置
+    const url = new URL(request.url);
+    const configKey = url.searchParams.get("config");
+    let finalYaml = originalYaml;
 
-    // 5. 如果找到配置，则进行合并
-    const finalYaml = config
-      ? await clashConfigService.mergeConfig(originalYaml, config)
-      : originalYaml;
+    if (configKey) {
+      const config = await clashConfigService.getAll();
+      const targetConfig = config.find(c => c.key === configKey);
+      if (targetConfig) {
+        finalYaml = await clashConfigService.mergeConfig(originalYaml, targetConfig);
+      }
+    }
 
-    // 6. 返回最终的 YAML
+    // 5. 返回最终的 YAML
     return new NextResponse(finalYaml, {
       headers: {
         "Content-Type": "text/yaml; charset=utf-8",

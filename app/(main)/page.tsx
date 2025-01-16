@@ -52,7 +52,7 @@ export default async function Home() {
           <CardTitle>用户列表</CardTitle>
         </CardHeader>
         <CardContent>
-          <UserList users={users} clashConfigs={clashConfigs} />
+          <UserList users={users} />
         </CardContent>
       </Card>
     </div>

@@ -4,7 +4,7 @@ import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 // Notice for cursor AI:
 // after change the schema, you need to run the following commands:
 // run `bun db:generate` to generate migration file
-// run `bun db:migrate` to migrate the schema
+// run `bun d1:migrate:local` to migrate the schema
 
 // User table
 export const users = sqliteTable("users", {
@@ -12,7 +12,6 @@ export const users = sqliteTable("users", {
   name: text("name").notNull(),
   subscriptionKey: text("subscription_key").notNull().unique(),
   subconverterId: text("subconverter_id"),
-  mergeConfigId: text("merge_config_id"),
   createdAt: text("created_at").notNull(),
   updatedAt: text("updated_at").notNull(),
 });
@@ -22,10 +21,6 @@ export const usersRelations = relations(users, ({ one }) => ({
   subconverter: one(subconverters, {
     fields: [users.subconverterId],
     references: [subconverters.id],
-  }),
-  mergeConfig: one(clashConfigs, {
-    fields: [users.mergeConfigId],
-    references: [clashConfigs.id],
   }),
 }));
 
@@ -50,17 +45,7 @@ export const clashConfigs = sqliteTable("clash_configs", {
   updatedAt: text("updated_at").notNull(),
 });
 
-// before modfy:
-
-// export const subscriptionSources = sqliteTable("subscription_sources", {
-//   id: text("id").primaryKey(),
-//   name: text("name").notNull(),
-//   inboundProtocol: text("inbound_protocol").notNull(),
-//   ip: text("ip"), // --> host
-//   url: text("url"), // --> accessUrl
-//   createdAt: text("created_at").notNull(),
-//   updatedAt: text("updated_at").notNull(),
-// });
+// Node table
 export const nodes = sqliteTable("nodes", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
@@ -71,18 +56,7 @@ export const nodes = sqliteTable("nodes", {
   updatedAt: text("updated_at").notNull(),
 });
 
-// before modify:
-
-// export const subscriptionSourceItems = sqliteTable("subscription_source_items", {
-//   id: text("id").primaryKey(),
-//   subscriptionSourceId: text("subscription_source_id").notNull(),
-//   userId: text("user_id").notNull(),
-//   enable: integer("enable", { mode: "boolean" }).notNull(),
-//   url: text("url").notNull(),
-//   upToDate: integer("up_to_date", { mode: "boolean" }).notNull(),
-//   createdAt: text("created_at").notNull(),
-//   updatedAt: text("updated_at").notNull(),
-// });
+// Node Client table
 export const nodeClients = sqliteTable("node_clients", {
   id: text("id").primaryKey(),
   nodeId: text("node_id").notNull(),
