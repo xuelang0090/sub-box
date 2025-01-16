@@ -58,10 +58,10 @@ export async function createNodeClient(data: {
     nodeId: data.nodeId,
     url: data.url,
   });
-  const userIds = data.userOptions.map(opt => opt.userId);
-  if (userIds.length > 0) {
-    await nodeClientService.setUserClientOptions(client.id, userIds, {
-      enable: data.userOptions[0]?.enable ?? true
+  // Set options for each user individually
+  for (const opt of data.userOptions) {
+    await nodeClientService.setUserClientOptions(client.id, [opt.userId], {
+      enable: opt.enable
     });
   }
   revalidatePath("/nodes");
@@ -83,10 +83,10 @@ export async function updateNodeClient(
     nodeId: data.nodeId,
     url: data.url,
   });
-  const userIds = data.userOptions.map(opt => opt.userId);
-  if (userIds.length > 0) {
-    await nodeClientService.setUserClientOptions(client.id, userIds, {
-      enable: data.userOptions[0]?.enable ?? true
+  // Set options for each user individually
+  for (const opt of data.userOptions) {
+    await nodeClientService.setUserClientOptions(client.id, [opt.userId], {
+      enable: opt.enable
     });
   }
   revalidatePath("/nodes");
@@ -116,13 +116,33 @@ export async function createOrUpdateNodeClient(
     }[];
   }
 ): Promise<NodeClient> {
+  // First check if there's an existing client for this node and any of the users
   const userIds = data.userOptions.map(opt => opt.userId);
-  const client = await nodeClientService.create({ nodeId, url: data.url });
-  if (userIds.length > 0) {
-    await nodeClientService.setUserClientOptions(client.id, userIds, { 
-      enable: data.userOptions[0]?.enable ?? true 
+  const existingClients = await nodeClientService.getNodeClientsWithUsers();
+  const existingClient = existingClients.find(client => 
+    client.nodeId === nodeId && 
+    client.users.some(u => userIds.includes(u.userId))
+  );
+
+  let client: NodeClient;
+  if (existingClient) {
+    // Update existing client
+    client = await nodeClientService.update(existingClient.id, { 
+      nodeId, 
+      url: data.url 
+    });
+  } else {
+    // Create new client
+    client = await nodeClientService.create({ nodeId, url: data.url });
+  }
+
+  // Set options for each user individually
+  for (const opt of data.userOptions) {
+    await nodeClientService.setUserClientOptions(client.id, [opt.userId], {
+      enable: opt.enable
     });
   }
+  
   revalidatePath("/nodes");
   return client;
 }
