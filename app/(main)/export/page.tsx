@@ -211,13 +211,13 @@ export default function ExportPage() {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4">
+          {/* <div className="space-y-4">
             <div className="rounded-md bg-muted p-4">
               <pre className="text-sm whitespace-pre-wrap max-h-[300px] overflow-auto">
                 {previewData && JSON.stringify(previewData, null, 2)}
               </pre>
             </div>
-          </div>
+          </div> */}
 
           <DialogFooter>
             <Button

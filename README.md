@@ -17,7 +17,7 @@ bun dev
 ## Production
 
 ```
-bun wrangler d1 create <DATABASE-NAME>
+bun wrangler d1 create prod-sub-box-db
 ```
 
 Modify `wrangler.toml` to use the correct database name.
