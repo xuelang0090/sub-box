@@ -99,14 +99,28 @@ export function BatchImportNodeClientDialog({ userId, node, nodes, users }: Batc
           throw new Error("未选择节点");
         }
 
-        for (const item of items) {
-          await createOrUpdateNodeClient(nodeId, {
-            url: item.url,
-            userOptions: [{
-              userId: item.userId,
-              enable: item.enable
-            }]
+        // 按URL分组，合并相同URL的用户选项
+        const groupedItems = items.reduce((acc, item) => {
+          if (!acc[item.url]) {
+            acc[item.url] = {
+              url: item.url,
+              userOptions: []
+            };
+          }
+          acc[item.url]!.userOptions.push({
+            userId: item.userId,
+            enable: item.enable
           });
+          return acc;
+        }, {} as Record<string, {
+          url: string;
+          userOptions: { userId: string; enable: boolean; }[];
+        }>);
+        console.log(groupedItems);
+
+        // 批量导入
+        for (const item of Object.values(groupedItems)) {
+          await createOrUpdateNodeClient(nodeId, item);
         }
 
         toast.success("导入成功");

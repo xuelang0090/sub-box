@@ -58,12 +58,23 @@ export async function createNodeClient(data: {
     nodeId: data.nodeId,
     url: data.url,
   });
-  // Set options for each user individually
+  
+  // Set options for all users at once
+  await nodeClientService.setUserClientOptions(
+    client.id,
+    data.userOptions.map(opt => opt.userId),
+    {
+      enable: true // 默认启用，具体的启用状态会在下面逐个更新
+    }
+  );
+
+  // Update individual user options
   for (const opt of data.userOptions) {
-    await nodeClientService.setUserClientOptions(client.id, [opt.userId], {
+    await nodeClientService.updateUserClientOption(client.id, opt.userId, {
       enable: opt.enable
     });
   }
+  
   revalidatePath("/nodes");
   return client;
 }
@@ -83,12 +94,23 @@ export async function updateNodeClient(
     nodeId: data.nodeId,
     url: data.url,
   });
-  // Set options for each user individually
+  
+  // Set options for all users at once
+  await nodeClientService.setUserClientOptions(
+    client.id,
+    data.userOptions.map(opt => opt.userId),
+    {
+      enable: true // 默认启用，具体的启用状态会在下面逐个更新
+    }
+  );
+
+  // Update individual user options
   for (const opt of data.userOptions) {
-    await nodeClientService.setUserClientOptions(client.id, [opt.userId], {
+    await nodeClientService.updateUserClientOption(client.id, opt.userId, {
       enable: opt.enable
     });
   }
+  
   revalidatePath("/nodes");
   return client;
 }
@@ -121,6 +143,7 @@ export async function createOrUpdateNodeClient(
   const existingClients = await nodeClientService.getNodeClientsWithUsers();
   const existingClient = existingClients.find(client => 
     client.nodeId === nodeId && 
+    client.url === data.url &&
     client.users.some(u => userIds.includes(u.userId))
   );
 
@@ -136,9 +159,18 @@ export async function createOrUpdateNodeClient(
     client = await nodeClientService.create({ nodeId, url: data.url });
   }
 
-  // Set options for each user individually
+  // Set options for all users at once
+  await nodeClientService.setUserClientOptions(
+    client.id,
+    data.userOptions.map(opt => opt.userId),
+    {
+      enable: true // 默认启用，具体的启用状态会在下面逐个更新
+    }
+  );
+
+  // Update individual user options
   for (const opt of data.userOptions) {
-    await nodeClientService.setUserClientOptions(client.id, [opt.userId], {
+    await nodeClientService.updateUserClientOption(client.id, opt.userId, {
       enable: opt.enable
     });
   }
