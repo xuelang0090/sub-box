@@ -21,7 +21,7 @@ export const db = async () => {
   /**
    * Don't call getRequestContext() at the top level
    */
-  client = globalForDb.client ?? (await getCloudflareContext()).env.DB;
+  client = globalForDb.client ?? (await getCloudflareContext({ async: true })).env.DB;
   if (env.NODE_ENV !== "production") globalForDb.client = client;
   return drizzle(client, { schema });
 };

@@ -6,6 +6,7 @@ import { nodeClientService } from "@/server/services/node-client-service";
 import { nodeService } from "@/server/services/node-service";
 import { userService } from "@/server/services/user-service";
 import { type User, type Subconverter } from "@/types";
+import { subconverterService } from "@/server/services/subconverter-service";
 
 export async function getUsers() {
   return userService.getAll();
@@ -50,9 +51,5 @@ export async function updateUserClientOption(
 }
 
 export async function getSubconverters() {
-  const response = await fetch("/api/subconverters");
-  if (!response.ok) {
-    throw new Error("Failed to fetch subconverters");
-  }
-  return response.json() as Promise<Subconverter[]>;
+  return subconverterService.getAll();
 }

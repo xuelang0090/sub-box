@@ -2,7 +2,7 @@
 
 一个简单的订阅管理应用程序。
 
-演示站点：
+演示站点：[sub-box-demo.awkmeo.workers.dev](https://sub-box-demo.awkmeo.workers.dev) （管理员账号：admin，密码：demo-password）
 
 ## 特点
 
