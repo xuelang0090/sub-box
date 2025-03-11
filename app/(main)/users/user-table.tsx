@@ -76,7 +76,7 @@ export function UserTable({ users, clients: items, nodes }: UserTableProps) {
         columns={columns}
         data={users}
         expandedContent={(user) => (
-          <UserNodeClientTable userId={user.id} items={itemsByUser[user.id] || []} nodes={nodes} />
+          <UserNodeClientTable userId={user.id} items={itemsByUser[user.id] || []} nodes={nodes} users={users} />
         )}
         expandedTitle={(user) => {
           const count = itemsByUser[user.id]?.length || 0;

@@ -7,17 +7,19 @@ import { DataTableColumnHeader } from "@/components/data-table/data-table-column
 import { DateTime } from "@/components/date-time";
 import { IdBadge } from "@/components/id-badge";
 import { Button } from "@/components/ui/button";
-import { type Node as DbNode, type NodeClient } from "@/types";
+import { type Node as DbNode, type NodeClient, type User } from "@/types";
 import { type ColumnDef } from "@tanstack/react-table";
+import { Badge } from "@/components/ui/badge";
 
 interface CreateColumnsOptions {
   userId: string;
   nodes: DbNode[];
+  users: User[];
   onEdit: (item: NodeClient & { users: { userId: string; enable: boolean; order: number; virtualOrder?: number }[] }) => void;
   onDelete: (item: NodeClient & { users: { userId: string; enable: boolean; order: number; virtualOrder?: number }[] }) => void;
 }
 
-export function createColumns({ userId, nodes, onEdit, onDelete }: CreateColumnsOptions): ColumnDef<NodeClient & { users: { userId: string; enable: boolean; order: number; virtualOrder?: number }[] }>[] {
+export function createColumns({ userId, nodes, users, onEdit, onDelete }: CreateColumnsOptions): ColumnDef<NodeClient & { users: { userId: string; enable: boolean; order: number; virtualOrder?: number }[] }>[] {
   return [
     {
       accessorKey: "users",
@@ -52,6 +54,27 @@ export function createColumns({ userId, nodes, onEdit, onDelete }: CreateColumns
       },
       meta: {
         title: "节点",
+      },
+    },
+    {
+      accessorKey: "users",
+      header: ({ column }) => <DataTableColumnHeader column={column} title="用户" />,
+      cell: ({ row }) => (
+        <div className="flex flex-wrap gap-1">
+          {row.original.users.map((userOption) => {
+            const user = users.find((u) => u.id === userOption.userId);
+            if (!user) return null;
+            return (
+              <Badge key={user.id} variant={userOption.enable ? "default" : "outline"}>
+                {user.name}
+                {!userOption.enable && <span className="ml-1">(已禁用)</span>}
+              </Badge>
+            );
+          })}
+        </div>
+      ),
+      meta: {
+        title: "用户",
       },
     },
     {

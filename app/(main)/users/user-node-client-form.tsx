@@ -6,19 +6,24 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { MultiSelect } from "@/components/ui/multi-select";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { type Node, type NodeClient } from "@/types";
+import { type Node, type NodeClient, type User } from "@/types";
 import { createOrUpdateNodeClient } from "../nodes/actions";
 
 const formSchema = z.object({
+  userIds: z.array(z.string()).min(1, "至少选择一个用户"),
   nodeId: z.string().min(1, "节点不能为空"),
-  url: z.string().min(1, "URL不能为空"),
-  enable: z.boolean(),
+  url: z.string().min(1, "URL不能为空"), // 不需要检查 url 是否是有效，因为可能有 vless:// 等格式
+  userOptions: z.array(z.object({
+    userId: z.string(),
+    enable: z.boolean(),
+  })),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -26,24 +31,35 @@ type FormData = z.infer<typeof formSchema>;
 interface UserNodeClientFormProps {
   userId: string;
   nodes: Node[];
+  users: User[];
   item?: NodeClient & { users: { userId: string; enable: boolean; order: number }[] };
   onSuccess?: () => void;
 }
 
-export function UserNodeClientForm({ userId, nodes, item, onSuccess }: UserNodeClientFormProps) {
+export function UserNodeClientForm({ userId, nodes, users, item, onSuccess }: UserNodeClientFormProps) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
-
-  const userOption = item?.users.find(u => u.userId === userId);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      userIds: item ? item.users.map(u => u.userId) : [userId],
       nodeId: item?.nodeId ?? (nodes.length === 1 ? nodes[0]?.id ?? "" : ""),
       url: item?.url ?? "",
-      enable: userOption?.enable ?? true,
+      userOptions: item ? item.users : [{ userId, enable: true }],
     },
   });
+
+  // Watch userIds to sync with userOptions
+  const watchedUserIds = form.watch("userIds");
+  useEffect(() => {
+    const currentOptions = form.getValues("userOptions");
+    const newOptions = watchedUserIds.map(userId => {
+      const existing = currentOptions.find(opt => opt.userId === userId);
+      return existing || { userId, enable: true };
+    });
+    form.setValue("userOptions", newOptions);
+  }, [watchedUserIds, form]);
 
   const selectedNode = nodes.find((n) => n.id === form.watch("nodeId"));
 
@@ -74,10 +90,7 @@ export function UserNodeClientForm({ userId, nodes, item, onSuccess }: UserNodeC
       try {
         await createOrUpdateNodeClient(data.nodeId, {
           url: data.url,
-          userOptions: [{
-            userId,
-            enable: data.enable
-          }]
+          userOptions: data.userOptions,
         });
 
         toast("保存成功");
@@ -92,6 +105,25 @@ export function UserNodeClientForm({ userId, nodes, item, onSuccess }: UserNodeC
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="userIds"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>用户</FormLabel>
+              <MultiSelect
+                value={field.value}
+                onValueChange={field.onChange}
+                options={users.map((user) => ({
+                  value: user.id,
+                  label: user.name,
+                }))}
+                placeholder="选择用户"
+              />
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <FormField
           control={form.control}
           name="nodeId"
@@ -131,20 +163,6 @@ export function UserNodeClientForm({ userId, nodes, item, onSuccess }: UserNodeC
                 <Textarea {...field} rows={6} className="font-mono text-sm" />
               </FormControl>
               <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="enable"
-          render={({ field }) => (
-            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-              <div className="space-y-0.5">
-                <FormLabel className="text-base">启用</FormLabel>
-              </div>
-              <FormControl>
-                <Switch checked={field.value} onCheckedChange={field.onChange} />
-              </FormControl>
             </FormItem>
           )}
         />

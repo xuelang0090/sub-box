@@ -17,7 +17,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { type Node as DbNode, type NodeClient } from "@/types";
+import { type Node as DbNode, type NodeClient, type User } from "@/types";
 import { deleteNodeClient } from "../nodes/actions";
 import { createColumns } from "./user-node-client-columns";
 import { UserNodeClientForm } from "./user-node-client-form";
@@ -27,9 +27,10 @@ interface UserNodeClientTableProps {
   userId: string;
   items: (NodeClient & { users: { userId: string; enable: boolean; order: number }[] })[];
   nodes: DbNode[];
+  users: User[];
 }
 
-export function UserNodeClientTable({ userId, items, nodes }: UserNodeClientTableProps) {
+export function UserNodeClientTable({ userId, items, nodes, users }: UserNodeClientTableProps) {
   const [editingItem, setEditingItem] = useState<NodeClient & { users: { userId: string; enable: boolean; order: number }[] } | null>(null);
   const [deletingItem, setDeletingItem] = useState<NodeClient & { users: { userId: string; enable: boolean; order: number }[] } | null>(null);
   const [isEditingOrder, setIsEditingOrder] = useState(false);
@@ -52,6 +53,7 @@ export function UserNodeClientTable({ userId, items, nodes }: UserNodeClientTabl
   const columns = createColumns({
     userId,
     nodes,
+    users,
     onEdit: setEditingItem,
     onDelete: setDeletingItem,
   });
@@ -99,6 +101,7 @@ export function UserNodeClientTable({ userId, items, nodes }: UserNodeClientTabl
         <UserNodeClientForm
           userId={userId}
           nodes={nodes}
+          users={users}
           item={editingItem ?? undefined}
           onSuccess={() => {
             setEditingItem(null);

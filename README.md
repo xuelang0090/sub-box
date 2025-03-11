@@ -83,6 +83,6 @@ bun run deploy
 ```bash
 cp wrangler.example.toml wrangler.toml
 cp .dev.vars.example .dev.vars
-bun d1:migrate:local
+DATABASE_NAME=prod-sub-box-db bun d1:migrate:local
 bun dev
 ```

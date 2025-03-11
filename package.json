@@ -12,7 +12,7 @@
     "db:check": "bun with-env drizzle-kit check",
     "db:studio": "bun with-env drizzle-kit studio",
     "db:studio:local": "bun with-env bun with-local-db drizzle-kit studio --config drizzle.local.config.ts",
-    "d1:migrate:local": "wrangler d1 migrations apply prod-sub-box-db --local",
+    "d1:migrate:local": "cross-env DATABASE_NAME=prod-sub-box-db wrangler d1 migrations apply $DATABASE_NAME --local",
     "d1:migrate:remote": "cross-env DATABASE_NAME=prod-sub-box-db wrangler d1 migrations apply $DATABASE_NAME --remote",
     "dev": "bun with-env next dev",
     "build": "bun with-env next build",
