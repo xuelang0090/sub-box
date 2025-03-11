@@ -1,0 +1,228 @@
+{
+  "users": [
+    {
+      "id": "e7fb4846-5f92-43b0-977b-1cc5c140717e",
+      "name": "user1",
+      "subscriptionKey": "6shoaTHl",
+      "subconverterId": null,
+      "createdAt": "2025-01-15T17:31:43.256Z",
+      "updatedAt": "2025-03-11T06:48:31.710Z"
+    },
+    {
+      "id": "4088c426-a30a-40a9-a8f8-63e9ff689f83",
+      "name": "user2",
+      "subscriptionKey": "N7tjBiQj",
+      "subconverterId": null,
+      "createdAt": "2025-01-30T13:15:41.039Z",
+      "updatedAt": "2025-03-11T06:48:36.750Z"
+    },
+    {
+      "id": "12a21637-db77-4ea8-984c-209658431565",
+      "name": "user666",
+      "subscriptionKey": "WE9ynI5Y",
+      "subconverterId": "c4e4895a-ffe0-49b7-82fc-3bae7e28aa93",
+      "createdAt": "2025-02-11T11:28:12.599Z",
+      "updatedAt": "2025-03-11T06:48:40.779Z"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "21e3b668-cdd1-4a0d-bcf0-3089d6b368bd",
+      "name": "BWG HK",
+      "type": "3x-ui",
+      "host": "45.6.6.6",
+      "accessUrl": null,
+      "createdAt": "2025-01-15T17:31:00.053Z",
+      "updatedAt": "2025-03-11T06:39:32.409Z"
+    },
+    {
+      "id": "12c22672-98ff-4476-a2ee-6e6c7e37b117",
+      "name": "DMIT lax.eb",
+      "type": "3x-ui",
+      "host": "154.8.8.8",
+      "accessUrl": null,
+      "createdAt": "2025-01-15T17:34:24.410Z",
+      "updatedAt": "2025-03-11T06:42:08.064Z"
+    },
+    {
+      "id": "21580920-aaa6-48cf-8a9e-ddaaed720616",
+      "name": "CLAW HK",
+      "type": "3x-ui",
+      "host": "47.3.3.3",
+      "accessUrl": null,
+      "createdAt": "2025-01-17T05:03:56.909Z",
+      "updatedAt": "2025-03-11T06:42:29.615Z"
+    },
+    {
+      "id": "33cdf06d-e437-4b96-a4eb-a936652083d5",
+      "name": "Flying Bird",
+      "type": "external-subscription",
+      "host": null,
+      "accessUrl": null,
+      "createdAt": "2025-02-12T05:08:05.138Z",
+      "updatedAt": "2025-02-12T05:08:05.138Z"
+    },
+    {
+      "id": "46a2fdaa-5d75-4876-b96c-51b7dd093f75",
+      "name": "BWG PowerBox US",
+      "type": "3x-ui",
+      "host": "144.1.1.1",
+      "accessUrl": null,
+      "createdAt": "2025-03-11T03:18:00.537Z",
+      "updatedAt": "2025-03-11T06:47:26.581Z"
+    }
+  ],
+  "nodeClients": [
+    {
+      "id": "674b3329-e4e8-4389-a1ac-9efa3db39ce3",
+      "nodeId": "21e3b668-cdd1-4a0d-bcf0-3089d6b368bd",
+      "url": "vless://4fbcc8db-e6fb-45f0-8faa-6f190bc68656@45.6.6.6:28888?type=tcp&security=reality&pbk=aaaaaa&fp=edge&sni=www.hsbc.com.hk&sid=aaaaa&spx=%2F&flow=xtls-rprx-vision#Hong%20Kong-bwg",
+      "createdAt": "2025-01-15T17:31:56.626Z",
+      "updatedAt": "2025-03-11T06:40:14.753Z"
+    },
+    {
+      "id": "328b8359-1dee-4d7d-8a62-3ab3fffb49b8",
+      "nodeId": "21580920-aaa6-48cf-8a9e-ddaaed720616",
+      "url": "vless://d284787e-8072-4772-8889-6004b69e36a6@47.3.3.3:24936?type=tcp&security=reality&pbk=aaa-aaa&fp=chrome&sni=www.hsbc.com.hk&sid=aaa&spx=%2F&flow=xtls-rprx-vision#Hong Kong-CLAW",
+      "createdAt": "2025-01-17T05:04:30.624Z",
+      "updatedAt": "2025-03-11T06:46:46.735Z"
+    },
+    {
+      "id": "15ded073-543f-478b-9636-3325f03abe8e",
+      "nodeId": "21580920-aaa6-48cf-8a9e-ddaaed720616",
+      "url": "vless://1d0ca22f-5f27-419c-b080-24ef7e0c96b1@47.3.3.3:24936?type=tcp&security=reality&pbk=aaa-aaa&fp=chrome&sni=www.hsbc.com.hk&sid=aaa&spx=%2F&flow=xtls-rprx-vision#Hong Kong-CLAW-user2",
+      "createdAt": "2025-02-11T11:36:27.186Z",
+      "updatedAt": "2025-03-11T06:47:53.071Z"
+    },
+    {
+      "id": "ae3ca721-b2dd-492a-9394-188175efe209",
+      "nodeId": "21580920-aaa6-48cf-8a9e-ddaaed720616",
+      "url": "vless://3de05bea-3d04-436d-b4f1-16a61ea2e9c6@47.3.3.3:24936?type=tcp&security=reality&pbk=aaa-aaa&fp=chrome&sni=www.hsbc.com.hk&sid=aaa&spx=%2F&flow=xtls-rprx-vision#Hong Kong-CLAW-user666",
+      "createdAt": "2025-02-11T11:36:29.960Z",
+      "updatedAt": "2025-03-11T06:47:58.259Z"
+    },
+    {
+      "id": "b4ca3755-1406-4d67-88f4-14310b2b9c95",
+      "nodeId": "21e3b668-cdd1-4a0d-bcf0-3089d6b368bd",
+      "url": "vless://71c972e6-e234-4ead-a1d0-5e6758111674@45.6.6.6:28888?type=tcp&security=reality&pbk=aaaaaa&fp=edge&sni=www.hsbc.com.hk&sid=aaaaa&spx=%2F&flow=xtls-rprx-vision#Hong%20Kong-bwg",
+      "createdAt": "2025-02-11T11:40:09.554Z",
+      "updatedAt": "2025-03-11T06:40:50.425Z"
+    },
+    {
+      "id": "999ad289-b8f4-44de-8789-3e453a279e7d",
+      "nodeId": "12c22672-98ff-4476-a2ee-6e6c7e37b117",
+      "url": "vless://a4e3360a-572e-40d7-9219-9229cebbe77f@154.8.8.8:23333?type=tcp&security=reality&pbk=aaa-aaa&fp=chrome&sni=yahoo.com&sid=aaa&spx=%2F&flow=xtls-rprx-vision#USA-DMIT-lax",
+      "createdAt": "2025-01-15T17:34:39.630Z",
+      "updatedAt": "2025-03-11T06:42:19.448Z"
+    },
+    {
+      "id": "45645624-e0eb-489a-82ab-a416446436ed",
+      "nodeId": "33cdf06d-e437-4b96-a4eb-a936652083d5",
+      "url": "https://aaa.com:2096/aaaaaaaa?clash=1&extend=1",
+      "createdAt": "2025-02-12T05:08:20.344Z",
+      "updatedAt": "2025-03-11T06:47:13.571Z"
+    },
+    {
+      "id": "4dbc0e37-9b03-425e-b736-f7020b18e6d9",
+      "nodeId": "46a2fdaa-5d75-4876-b96c-51b7dd093f75",
+      "url": "vless://219706cb-b2fa-40ed-b06e-fa14cbea34cc@144.1.1.1:11123?type=tcp&security=reality&pbk=aaa-aaa&fp=chrome&sni=cloudflare.com&sid=aaa&spx=%2F#USA-BWG-PowerBox",
+      "createdAt": "2025-03-11T03:18:38.488Z",
+      "updatedAt": "2025-03-11T06:47:40.308Z"
+    }
+  ],
+  "userClientOptions": [
+    {
+      "userId": "e7fb4846-5f92-43b0-977b-1cc5c140717e",
+      "nodeClientId": "328b8359-1dee-4d7d-8a62-3ab3fffb49b8",
+      "enable": true,
+      "order": 1,
+      "createdAt": "2025-01-17T05:05:02.100Z",
+      "updatedAt": "2025-03-11T06:46:46.759Z"
+    },
+    {
+      "userId": "e7fb4846-5f92-43b0-977b-1cc5c140717e",
+      "nodeClientId": "674b3329-e4e8-4389-a1ac-9efa3db39ce3",
+      "enable": true,
+      "order": 0,
+      "createdAt": "2025-02-05T14:16:22.092Z",
+      "updatedAt": "2025-03-11T06:40:14.779Z"
+    },
+    {
+      "userId": "4088c426-a30a-40a9-a8f8-63e9ff689f83",
+      "nodeClientId": "15ded073-543f-478b-9636-3325f03abe8e",
+      "enable": true,
+      "order": 1,
+      "createdAt": "2025-02-11T11:36:27.390Z",
+      "updatedAt": "2025-03-11T06:47:53.098Z"
+    },
+    {
+      "userId": "12a21637-db77-4ea8-984c-209658431565",
+      "nodeClientId": "ae3ca721-b2dd-492a-9394-188175efe209",
+      "enable": true,
+      "order": 3,
+      "createdAt": "2025-02-11T11:36:30.159Z",
+      "updatedAt": "2025-03-11T06:47:58.281Z"
+    },
+    {
+      "userId": "4088c426-a30a-40a9-a8f8-63e9ff689f83",
+      "nodeClientId": "b4ca3755-1406-4d67-88f4-14310b2b9c95",
+      "enable": true,
+      "order": 0,
+      "createdAt": "2025-02-11T11:40:09.740Z",
+      "updatedAt": "2025-03-11T06:40:50.449Z"
+    },
+    {
+      "userId": "e7fb4846-5f92-43b0-977b-1cc5c140717e",
+      "nodeClientId": "999ad289-b8f4-44de-8789-3e453a279e7d",
+      "enable": true,
+      "order": 6,
+      "createdAt": "2025-01-15T17:34:39.630Z",
+      "updatedAt": "2025-03-11T06:42:19.476Z"
+    },
+    {
+      "userId": "12a21637-db77-4ea8-984c-209658431565",
+      "nodeClientId": "999ad289-b8f4-44de-8789-3e453a279e7d",
+      "enable": true,
+      "order": 5,
+      "createdAt": "2025-02-12T11:13:03.404Z",
+      "updatedAt": "2025-03-11T06:42:19.472Z"
+    },
+    {
+      "userId": "e7fb4846-5f92-43b0-977b-1cc5c140717e",
+      "nodeClientId": "4dbc0e37-9b03-425e-b736-f7020b18e6d9",
+      "enable": true,
+      "order": 5,
+      "createdAt": "2025-03-11T03:18:38.586Z",
+      "updatedAt": "2025-03-11T06:47:40.330Z"
+    },
+    {
+      "userId": "e7fb4846-5f92-43b0-977b-1cc5c140717e",
+      "nodeClientId": "45645624-e0eb-489a-82ab-a416446436ed",
+      "enable": true,
+      "order": 0,
+      "createdAt": "2025-03-11T06:47:13.580Z",
+      "updatedAt": "2025-03-11T06:47:13.600Z"
+    }
+  ],
+  "subconverters": [
+    {
+      "id": "c4e4895a-ffe0-49b7-82fc-3bae7e28aa93",
+      "url": "https://subconverter-url.com",
+      "options": "insert=false&config=https%3A%2F%2Fraw.githubusercontent.com%2FACL4SSR%2FACL4SSR%2Fmaster%2FClash%2Fconfig%2FACL4SSR_Online_Full_NoAuto.ini&emoji=true&list=false&xudp=false&udp=false&tfo=false&expand=true&scv=false&fdn=false&new_name=true",
+      "isDefault": true,
+      "createdAt": "2025-01-15T17:29:19.343Z",
+      "updatedAt": "2025-03-11T06:44:22.487Z"
+    }
+  ],
+  "clashConfigs": [
+    {
+      "id": "acc1316c-086c-4111-a3ea-1b6489bfbdb9",
+      "key": "normal",
+      "name": "normal",
+      "globalConfig": "port: 7890\nsocks-port: 7891\nallow-lan: true\nmode: rule\nlog-level: info\nexternal-controller: :9090\nprofile:\n  store-selected: true      # 存储 select 选择记录\n  store-fake-ip: true        # 持久化 fake-ip\ndns:\n  enable: true\n  prefer-h3: true\n  listen: 0.0.0.0:1053\n  ipv6: true\n  default-nameserver:\n    - system\n    - 223.5.5.5\n  enhanced-mode: fake-ip\n  fake-ip-range: 198.18.0.1/16\n  fake-ip-filter:\n    - '+.lan'\n    - '+.local'\n    - localhost.ptlogin2.qq.com\n    - +.stun.*.*\n    - +.stun.*.*.*\n    - +.stun.*.*.*.*\n    - +.stun.*.*.*.*.*\n    - \"*.n.n.srv.nintendo.net\"\n    - +.stun.playstation.net\n    - xbox.*.*.microsoft.com\n    - \"*.*.xboxlive.com\"\n    - 'swscan.apple.com'\n    - 'mesu.apple.com'\n    - apps.apple.com\n    - '*.mcdn.bilivideo.cn'\n    - '*.bilibili.com'\n    - '*.jd.com'\n    - controlplane.tailscale.com\n    - log.tailscale.io\n  nameserver-policy:\n    # 'www.baidu.com': '114.114.114.114'\n    # 'geosite:cn': [system, 223.5.5.5]\n    # '+.internal.crop.com': '10.0.0.1'\n    'geosite:geolocation-!cn': [tls://8.8.4.4, https://1.0.0.1/dns-query]\n    # 'www.baidu.com,+.google.cn': https://doh.pub/dns-query\n    'geosite:private,apple': https://dns.alidns.com/dns-query\n    #'rule-set:google,cloudflare': 8.8.8.8\n    'dl.google.com': https://doh.pub/dns-query\n    'geosite:googlefcm': https://doh.pub/dns-query\n  nameserver:\n    - system\n    - 223.5.5.5\n    - https://dns.alidns.com/dns-query#h3=true\n    - https://doh.pub/dns-query\n  fallback:\n    - tls://8.8.4.4\n    - tls://1.1.1.1\n  proxy-server-nameserver:\n    - https://dns.alidns.com/dns-query#h3=true\n    - https://doh.pub/dns-query\n  fallback-filter:\n    geoip: true\n    geoip-code: CN\n    geosite:\n      - gfw\n    ipcidr:\n      - 240.0.0.0/4\n    domain:\n      - '+.google.com'\n      - '+.facebook.com'\n      - '+.youtube.com'\ntun:\n  enable: true\n  stack: system\n  auto-route: true\n  auto-detect-interface: true\n  dns-hijack:\n    - any:53",
+      "rules": "DOMAIN,mtalk.google.com,DIRECT\nDOMAIN,mtalk4.google.com,DIRECT\nDOMAIN,mtalk-staging.google.com,DIRECT\nDOMAIN,mtalk-dev.google.com,DIRECT\nDOMAIN,alt1-mtalk.google.com,DIRECT\nDOMAIN,alt1-mtalk.google.com,DIRECT\nDOMAIN,alt2-mtalk.google.com,DIRECT\nDOMAIN,alt3-mtalk.google.com,DIRECT\nDOMAIN,alt4-mtalk.google.com,DIRECT\nDOMAIN,alt5-mtalk.google.com,DIRECT\nDOMAIN,alt6-mtalk.google.com,DIRECT\nDOMAIN,alt7-mtalk.google.com,DIRECT\nDOMAIN,alt8-mtalk.google.com,DIRECT",
+      "createdAt": "2025-02-05T14:18:49.371Z",
+      "updatedAt": "2025-03-11T06:49:32.619Z"
+    }
+  ]
+}
