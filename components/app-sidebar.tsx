@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { Box, Cog, FileJson, Home, Link2, LogOut, Users, ExternalLink, type LucideIcon, FileText } from "lucide-react";
+import { Box, Cog, FileJson, Home, Link2, LogOut, Users, ExternalLink, type LucideIcon, FileText, Github } from "lucide-react";
 import { toast } from "sonner";
 import pkg from "@/package.json";
 import Link from "next/link";
@@ -64,15 +64,9 @@ const navItems: NavItem[] = [
 
 const docItems: NavItem[] = [
   {
-    title: "文档",
-    href: "https://github.com/moezx/sub-box",
-    icon: FileText,
-    external: true,
-  },
-  {
-    title: "API",
-    href: "https://github.com/moezx/sub-box/wiki/API",
-    icon: FileText,
+    title: "Github",
+    href: "https://github.com/kleinrui/sub-box",
+    icon: Github,
     external: true,
   },
 ];
@@ -140,7 +134,7 @@ export function AppSidebar({ className, ...props }: React.ComponentProps<typeof 
           </SidebarGroupContent>
         </SidebarGroup>
         <SidebarGroup>
-          <SidebarGroupLabel>文档</SidebarGroupLabel>
+          <SidebarGroupLabel>外部链接</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {docItems.map((item) => (
