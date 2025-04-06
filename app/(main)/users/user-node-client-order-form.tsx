@@ -1,31 +1,15 @@
 "use client";
 
-import { useTransition } from "react";
-import { toast } from "sonner";
-import { GripVertical } from "lucide-react";
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-} from "@dnd-kit/core";
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  useSortable,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
+import { useState, useTransition } from "react";
+import { closestCenter, DndContext, KeyboardSensor, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { useState } from "react";
+import { GripVertical } from "lucide-react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { type NodeClient } from "@/types";
-import { type Node as DbNode } from "@/types";
+import { type Node as DbNode, type NodeClient } from "@/types";
 import { updateUserClientOption } from "./actions";
 
 type NodeClientWithUsers = NodeClient & { users: { userId: string; enable: boolean; order: number }[] };
@@ -37,14 +21,7 @@ interface SortableItemProps {
 }
 
 function SortableItem({ id, url, nodeName }: SortableItemProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -126,28 +103,16 @@ export function UserNodeClientOrderForm({ userId, items, nodes, onSuccess }: Use
 
   return (
     <div className="space-y-4">
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-      >
-        <SortableContext
-          items={localItems.map((item) => item.id)}
-          strategy={verticalListSortingStrategy}
-        >
-          {localItems.map((item) => {
-            const node = nodes.find((n) => n.id === item.nodeId);
-            return (
-              <SortableItem
-                key={item.id}
-                id={item.id}
-                url={item.url}
-                nodeName={node?.name}
-              />
-            );
-          })}
-        </SortableContext>
-      </DndContext>
+      <div className="max-h-[calc(100vh-150px)] overflow-y-auto">
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <SortableContext items={localItems.map((item) => item.id)} strategy={verticalListSortingStrategy}>
+            {localItems.map((item) => {
+              const node = nodes.find((n) => n.id === item.nodeId);
+              return <SortableItem key={item.id} id={item.id} url={item.url} nodeName={node?.name} />;
+            })}
+          </SortableContext>
+        </DndContext>
+      </div>
 
       <div className="flex justify-end gap-2">
         <Button onClick={() => onSuccess?.()} variant="outline">
@@ -159,4 +124,4 @@ export function UserNodeClientOrderForm({ userId, items, nodes, onSuccess }: Use
       </div>
     </div>
   );
-} 
+}
